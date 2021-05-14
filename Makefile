@@ -7,10 +7,6 @@ peter-quest : main.o
 
 main.o: main.c
 	gcc $(FLAGS) $< 
-	
+
 clean:
 	rm -f *.o
-
-real-clean:
-	@make clean
-	rm 
