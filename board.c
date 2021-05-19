@@ -1,5 +1,15 @@
 #include "board.h"
 
+Hero* get_hero(Box** board, int column, char line){
+	return board[(int)(line-'a')][column-1].hero;
+}
+
+
+void  set_hero(Box** board, int column, char line, Hero* hero)
+{
+  	board[(int)(line-'a')][column-1].hero = hero;
+}
+
 Box** init_board()
 {
 	Box** result = (Box**) calloc(HEIGHT, sizeof(Box*));
@@ -12,15 +22,15 @@ Box** init_board()
 		}
 		result[i] = line;
 	}
+	
+
 	return result;
 }
 
 char get_value(Hero* hero)
 {
 	if(hero == NULL) return ' ';
-	
-	printf("%c\n",hero->type );
-	return 'A';
+	return hero->race;
 }
 
 void display_board(Box** board)

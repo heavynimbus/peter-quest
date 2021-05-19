@@ -7,4 +7,5 @@ typedef struct{
 	char y;
 }Box;
 
+// create a box
 Box create_box(int x, char y, Hero* hero); 
