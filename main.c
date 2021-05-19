@@ -3,9 +3,10 @@
 
 int main()
 {
-	printf("Program starting\n");
+	printf("Program starting..\n");
 
 	Game g = init_game();
+
 
 	Hero ally1 = create_hero(ALLY, 'A');
 	Hero ally2 = create_hero(ALLY, 'B');
