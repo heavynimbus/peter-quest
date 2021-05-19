@@ -5,9 +5,16 @@ int main()
 {
 	printf("Program starting..\n");
 
-	Game g = init_game();
 
-	Hero* ally1 = create_hero(ALLY, ARCHER);
+	char res;
+
+	printf("Start a new game ? Y/N \n");
+	scanf("%c", &res);
+
+	if (res == 'Y') {
+		Game g = init_game();
+
+		Hero* ally1 = create_hero(ALLY, ARCHER);
 	Hero* ally2 = create_hero(ALLY, SOLDIER);
 	Hero* ally3 = create_hero(ALLY, ARCHER);
 	Hero* ally4 = create_hero(ALLY, TRICKSTER);
@@ -24,10 +31,11 @@ int main()
 	set_hero(g.board, 7, 'b', enemy2);
 	set_hero(g.board, 6, 'd', enemy3);
 	set_hero(g.board, 7, 'd', enemy4);	
-
-	printf("Board initialized\n");
+		printf("Board initialized\n");
+		
+		display_board(g.board);
+	}
 	
-	display_board(g.board);
 
 	printf("Stop running\n");
 	return 0; // No error 
