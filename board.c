@@ -18,7 +18,7 @@ Box** init_board()
 		Box* line = (Box*) calloc(WIDTH, sizeof(Box));
 		for(int j = 0; j < WIDTH; j++)
 		{
-			line[j] = create_box( (j + 1), ('a' + i), NULL);
+			line[j] = create_box( (j + 1), ('a' + i), create_hero(NONE_HERO, NONE_RACE));
 		}
 		result[i] = line;
 	}
@@ -27,11 +27,6 @@ Box** init_board()
 	return result;
 }
 
-char get_value(Hero* hero)
-{
-	if(hero == NULL) return ' ';
-	return hero->race;
-}
 
 void display_board(Box** board)
 {
@@ -46,7 +41,7 @@ void display_board(Box** board)
 		char values[WIDTH] = {0}; // init all values to 0
 		for(int j = 0; j < WIDTH; j++)
 		{
-			values[j] = get_value(board[i][j].hero);
+			values[j] = get_char(board[i][j].hero->race->type);
 		}
 		sprintf(line_to_print, "%c\t|%c|%c|%c|%c|%c|%c|%c|", (char)('a'+ i) , values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
 		printf("%s\n%s\n", line_to_print, filling_line);
