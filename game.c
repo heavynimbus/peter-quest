@@ -51,8 +51,8 @@ void playGame(Game game) {
         printf("Le joueur indique les coordonnées d'une de ses unités : \n");
 	    scanf(" %c%c", &response1, &response2);
     }
-    char l=response1;
-    int c=(int)response2-'0';
+    //char l=response1;
+    //int c=(int)response2-'0';
     //choose_move(board, c+1, l, get_hero(board, c, l));    
     display_board(board);
 }

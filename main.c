@@ -5,8 +5,11 @@ int main()
 {
 	printf("Program starting..\n");
 
-
 	char res = 'Y';
+	Game g = init_game();
+	printf("Board initialized\n");
+	
+	display_board(g.board);
 
 	printf("Start a new game ? Y/N \n");
 	scanf("%c", &res);
@@ -34,14 +37,9 @@ int main()
 		printf("Board initialized\n");
 		
 		display_board(g.board);
-<<<<<<< HEAD
-	}
-	
-=======
 
 		//TODO: régler le problème avec l'utilisation de board de g (game)
 		playGame(g);
->>>>>>> feat have unit, faet play game
 
 		printf("Start a new game ? Y/N \n");
 		scanf("%c", &res);		
