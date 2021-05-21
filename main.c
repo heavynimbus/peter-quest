@@ -5,7 +5,6 @@ int main()
 {
 	printf("Program starting..\n");
 
-	char res = 'Y';
 	Game g = init_game();
 	printf("Board initialized\n");
 	
