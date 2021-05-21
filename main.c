@@ -6,12 +6,12 @@ int main()
 	printf("Program starting..\n");
 
 
-	char res;
+	char res = 'Y';
 
 	printf("Start a new game ? Y/N \n");
 	scanf("%c", &res);
 
-	if (res == 'Y') {
+	while (res == 'Y') {
 		Game g = init_game();
 
 		Hero* ally1 = create_hero(ALLY, ARCHER);
@@ -34,9 +34,18 @@ int main()
 		printf("Board initialized\n");
 		
 		display_board(g.board);
+<<<<<<< HEAD
 	}
 	
+=======
 
+		//TODO: régler le problème avec l'utilisation de board de g (game)
+		playGame(g);
+>>>>>>> feat have unit, faet play game
+
+		printf("Start a new game ? Y/N \n");
+		scanf("%c", &res);		
+	}
 	printf("Stop running\n");
 	return 0; // No error 
 }
