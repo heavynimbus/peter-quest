@@ -37,6 +37,34 @@ int have_unit(Box** board, int column, char line) {
 }
 
 void choose_move(Box** board, int column, char line, Hero* hero) {
+    /*
+    int res = 0;
+    // check la race, on a le range a la fin
+
+    int range = 1;
+    // deplacement possible
+    // TODO: change range by hero.range hero->race->range
+    for (int k=1; k<range; k++) {
+        if (get_hero(board, column+k, line) == ' ') {
+            printf("Un emplacement est trouvé");
+            res++;
+        }
+        if (get_hero(board, column-k, line) == ' ') {
+            printf("Un emplacement est trouvé");
+            res++;
+        }
+        if (get_hero(board, column, line+k) == ' ') {
+            printf("Un emplacement est trouvé");
+            res++;
+        }
+        if (get_hero(board, column, line-k) == ' ') {
+            printf("Un emplacement est trouvé");
+            res++;
+        }
+    }
+    printf("Emplacements trouvés : %d", res);
+    */
+    // choix du déplacement peut etre dans le deplace
     set_hero(board, column, line, hero);
 }
 

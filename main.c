@@ -10,7 +10,7 @@ int main()
 	printf("Board initialized\n");
 	
 	display_board(g.board);
-
+	char res;
 	printf("Start a new game ? Y/N \n");
 	scanf("%c", &res);
 
