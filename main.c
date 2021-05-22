@@ -17,22 +17,22 @@ int main()
 		Game g = init_game();
 
 		Hero* ally1 = create_hero(ALLY, ARCHER);
-	Hero* ally2 = create_hero(ALLY, SOLDIER);
-	Hero* ally3 = create_hero(ALLY, ARCHER);
-	Hero* ally4 = create_hero(ALLY, TRICKSTER);
-	set_hero(g.board, 1, 'b', ally1);
-	set_hero(g.board, 2, 'b', ally2);
-	set_hero(g.board, 1, 'd', ally3);
-	set_hero(g.board, 2, 'd', ally4);
+		Hero* ally2 = create_hero(ALLY, SOLDIER);
+		Hero* ally3 = create_hero(ALLY, ARCHER);
+		Hero* ally4 = create_hero(ALLY, TRICKSTER);
+		set_hero(g.board, 1, 'b', ally1);
+		set_hero(g.board, 2, 'b', ally2);
+		set_hero(g.board, 1, 'd', ally3);
+		set_hero(g.board, 2, 'd', ally4);
 
-	Hero* enemy1 = create_hero(ENEMY, TRICKSTER);
-	Hero* enemy2 = create_hero(ENEMY, ARCHER);
-	Hero* enemy3 = create_hero(ENEMY, SOLDIER);
-	Hero* enemy4 = create_hero(ENEMY, ARCHER);
-	set_hero(g.board, 6, 'b', enemy1);
-	set_hero(g.board, 7, 'b', enemy2);
-	set_hero(g.board, 6, 'd', enemy3);
-	set_hero(g.board, 7, 'd', enemy4);	
+		Hero* enemy1 = create_hero(ENEMY, TRICKSTER);
+		Hero* enemy2 = create_hero(ENEMY, ARCHER);
+		Hero* enemy3 = create_hero(ENEMY, SOLDIER);
+		Hero* enemy4 = create_hero(ENEMY, ARCHER);
+		set_hero(g.board, 6, 'b', enemy1);
+		set_hero(g.board, 7, 'b', enemy2);
+		set_hero(g.board, 6, 'd', enemy3);
+		set_hero(g.board, 7, 'd', enemy4);	
 		printf("Board initialized\n");
 		
 		display_board(g.board);
