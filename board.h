@@ -13,5 +13,3 @@ void display_board(Box** board);
 void set_hero(Box** board, int column, char line, Hero* hero);
 
 Hero* get_hero(Box** board, int column, char line);
-
-char get_value(Hero* hero);

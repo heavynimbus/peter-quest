@@ -27,10 +27,7 @@ int can_attack(Hero hero){
 
 int have_unit(Box** board, int column, char line) {
     Hero* resHero = get_hero(board, column, line);
-    
-    printf("%c \n", get_value(resHero));
-
-    if(get_value(resHero) != ' ') {
+    if(get_char(resHero->race->type) != ' ') {
         return TRUE;
     }
     return FALSE;
@@ -69,15 +66,17 @@ void choose_move(Box** board, int column, char line, Hero* hero) {
 }
 
 void playGame(Game game) {
-    char response1;
-    char response2;
+    char* response1 = malloc(sizeof(char));
+    char* response2 = malloc(sizeof(char));
     Box** board = game.board;
     printf("Le joueur indique les coordonnées d'une de ses unités : \n");
-	scanf(" %c%c", &response1, &response2);
-    while (have_unit(board, response1, response2) == FALSE) {
+	scanf(" %c%c", response1, response2);
+    
+    //test if unit exist
+    while (have_unit(board, (int)*response2-48, *response1) == FALSE) {
         printf("Mauvaises coordonnées, veuillez renseigner de bonnes coordonnées.\n");
         printf("Le joueur indique les coordonnées d'une de ses unités : \n");
-	    scanf(" %c%c", &response1, &response2);
+	    scanf(" %c%c", response1, response2);
     }
     //char l=response1;
     //int c=(int)response2-'0';
