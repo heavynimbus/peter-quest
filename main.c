@@ -120,22 +120,6 @@ int main()
 					set_player(g, player2_username, HUMAN, 2);
 					display_player(g.player1);
 					display_player(g.player2);
-					Hero* ally1 = create_hero(BLUE, ARCHER);
-					Hero* ally2 = create_hero(BLUE, SOLDIER);
-					Hero* ally3 = create_hero(BLUE, ARCHER);
-					Hero* ally4 = create_hero(BLUE, TRICKSTER);
-					set_hero(g.board, 1, 'b', ally1);
-					set_hero(g.board, 2, 'b', ally2);
-					set_hero(g.board, 1, 'd', ally3);
-					set_hero(g.board, 2, 'd', ally4);
-					Hero* enemy1 = create_hero(RED, TRICKSTER);
-					Hero* enemy2 = create_hero(RED, ARCHER);
-					Hero* enemy3 = create_hero(RED, SOLDIER);
-					Hero* enemy4 = create_hero(RED, ARCHER);
-					set_hero(g.board, 6, 'b', enemy1);
-					set_hero(g.board, 7, 'b', enemy2);
-					set_hero(g.board, 6, 'd', enemy3);
-					set_hero(g.board, 7, 'd', enemy4);	
 					
 					display_board(g.board);
 					// faire la suite du jeu 

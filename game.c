@@ -1,11 +1,31 @@
 #include "game.h"
 
-Game init_game() {
+void init_heros(Game game){
+    Hero* ally1 = create_hero(BLUE, ARCHER);
+    Hero* ally2 = create_hero(BLUE, SOLDIER);
+    Hero* ally3 = create_hero(BLUE, ARCHER);
+    Hero* ally4 = create_hero(BLUE, TRICKSTER);
+    set_hero(game.board, 1, 'b', ally1);
+    set_hero(game.board, 2, 'b', ally2);
+    set_hero(game.board, 1, 'd', ally3);
+    set_hero(game.board, 2, 'd', ally4);
+    Hero* enemy1 = create_hero(RED, TRICKSTER);
+    Hero* enemy2 = create_hero(RED, ARCHER);
+    Hero* enemy3 = create_hero(RED, SOLDIER);
+    Hero* enemy4 = create_hero(RED, ARCHER);
+    set_hero(game.board, 6, 'b', enemy1);
+    set_hero(game.board, 7, 'b', enemy2);
+    set_hero(game.board, 6, 'd', enemy3);
+    set_hero(game.board, 7, 'd', enemy4);  
+}
 
+Game init_game() {
     Box** board = init_board();
     Player* player1 = malloc(sizeof(Player));
     Player* player2 = malloc(sizeof(Player));
-    return (Game) {board, player1, player2};
+    Game game =(Game) {board, player1, player2};
+    init_heros(game);
+    return game;
 }
 
 void deplace(Hero hero){
@@ -98,3 +118,5 @@ void set_player(Game g, char* username, PlayerType type, int id){
     }
     
 }
+
+
