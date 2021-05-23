@@ -2,7 +2,7 @@
 #include "race.h"
 
 typedef enum {
-	BLUE, RED, NONE_HERO
+	ALLY, ENEMY, NONE_HERO
 }HeroType;
 
 typedef struct{

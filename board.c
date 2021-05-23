@@ -4,10 +4,6 @@ Hero* get_hero(Box** board, int column, char line){
 	return board[(int)(line-'a')][column-1].hero;
 }
 
-int get_camp(Box** board, int column, char line){
-	Hero* hero = get_hero(board, column, line);
-	return hero->type;
-}
 
 void  set_hero(Box** board, int column, char line, Hero* hero)
 {
