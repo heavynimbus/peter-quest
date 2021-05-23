@@ -3,8 +3,9 @@
 Game init_game() {
 
     Box** board = init_board();
-
-    return (Game) {board, 'A', 'B'};
+    Player* player1 = malloc(sizeof(Player));
+    Player* player2 = malloc(sizeof(Player));
+    return (Game) {board, player1, player2};
 }
 
 void deplace(Hero hero){
@@ -65,7 +66,7 @@ void choose_move(Box** board, int column, char line, Hero* hero) {
     set_hero(board, column, line, hero);
 }
 
-void playGame(Game game) {
+void play_game(Game game) {
     char* response1 = malloc(sizeof(char));
     char* response2 = malloc(sizeof(char));
     Box** board = game.board;
@@ -82,4 +83,18 @@ void playGame(Game game) {
     //int c=(int)response2-'0';
     //choose_move(board, c+1, l, get_hero(board, c, l));    
     display_board(board);
+}
+
+void set_player(Game g, char* username, PlayerType type, int id){
+    switch(id){
+        case 1:
+            g.player1->username = username;
+            g.player1->type = type;
+            break;
+        case 2:
+            g.player2->username = username;
+            g.player2->type = type;
+            break;
+    }
+    
 }

@@ -1,6 +1,5 @@
 #include "main.h"
 #include "game.h"
-#include "joueur.h"
 
 int show_logo(){
 	system("clear");
@@ -89,6 +88,15 @@ int menu ( int argc, ... )
     return ( choix );
 }
 
+char* ask_player_name(int id){
+	show_logo();
+	char* result = calloc(30, sizeof(char));
+	printf("Player %d\nEntrez votre nom:\t", id);
+	fgets(result, 30, stdin);
+	if(result[strlen(result)-1]=='\n')result[strlen(result)-1]=0;
+	return result;
+}
+
 int main()
 {
 	show_logo();
@@ -104,9 +112,14 @@ int main()
 					printf("Cette fonctionnalité n'a pas encore été implémentée..\n");
 					getchar();
 					return main();
-				case 1:
-					show_logo();
+				case 1: ;
+					char* player1_username = ask_player_name(1);
+					char* player2_username = ask_player_name(2);
 					Game g = init_game();
+					set_player(g, player1_username, HUMAN, 1);
+					set_player(g, player2_username, HUMAN, 2);
+					display_player(g.player1);
+					display_player(g.player2);
 					Hero* ally1 = create_hero(BLUE, ARCHER);
 					Hero* ally2 = create_hero(BLUE, SOLDIER);
 					Hero* ally3 = create_hero(BLUE, ARCHER);
@@ -125,9 +138,10 @@ int main()
 					set_hero(g.board, 7, 'd', enemy4);	
 					
 					display_board(g.board);
-					
+					// faire la suite du jeu 
 					menu(2,"Deplacer un pion", "Attaquer");
 					return main();
+				case 2: return main();
 			}
 			break;
 		case 1:
