@@ -13,10 +13,10 @@ void display_hero(Hero* hero){
 		char* type;
 		switch(hero->type){
 			case BLUE:
-				type = "ally";
+				type = "blue";
 				break;
 			case RED:
-				type = "enemy";
+				type = "red";
 				break;
 			case NONE_HERO:
 				type = "none_hero";
