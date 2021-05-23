@@ -37,7 +37,7 @@ void display_board(Box** board)
 	const char* numbers_line = "\t 1 2 3 4 5 6 7";
 	const char* filling_line = "\t|-------------|";
 
-	printf("%s\n%s\n", numbers_line, filling_line);
+	printf("\t\t\t\t\t\t%s\n\t\t\t\t\t\t%s\n", numbers_line, filling_line);
 
 	for(int i = 0; i < HEIGHT; i++){
 		
@@ -48,6 +48,6 @@ void display_board(Box** board)
 			values[j] = get_char(board[i][j].hero->race->type);
 		}
 		sprintf(line_to_print, "%c\t|%c|%c|%c|%c|%c|%c|%c|", (char)('a'+ i) , values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
-		printf("%s\n%s\n", line_to_print, filling_line);
+		printf("\t\t\t\t\t\t%s\n\t\t\t\t\t\t%s\n", line_to_print, filling_line);
 	}
 }
