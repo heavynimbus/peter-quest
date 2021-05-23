@@ -24,5 +24,8 @@ race.o: race.c race.h main.h
 	gcc $(FLAGS) $<
 
 joueur.o: joueur.c joueur.h main.h
+	gcc $(FLAGS) $<
+
+	
 clean:
 	rm -f *.o
