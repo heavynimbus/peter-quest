@@ -115,7 +115,6 @@ int main()
 					set_hero(g.board, 2, 'b', ally2);
 					set_hero(g.board, 1, 'd', ally3);
 					set_hero(g.board, 2, 'd', ally4);
-
 					Hero* enemy1 = create_hero(RED, TRICKSTER);
 					Hero* enemy2 = create_hero(RED, ARCHER);
 					Hero* enemy3 = create_hero(RED, SOLDIER);
