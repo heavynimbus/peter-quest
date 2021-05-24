@@ -1,10 +1,31 @@
 #include "game.h"
 
+void init_heros(Game game){
+    Hero* ally1 = create_hero(BLUE, ARCHER);
+    Hero* ally2 = create_hero(BLUE, SOLDIER);
+    Hero* ally3 = create_hero(BLUE, ARCHER);
+    Hero* ally4 = create_hero(BLUE, TRICKSTER);
+    set_hero(game.board, 1, 'b', ally1);
+    set_hero(game.board, 2, 'b', ally2);
+    set_hero(game.board, 1, 'd', ally3);
+    set_hero(game.board, 2, 'd', ally4);
+    Hero* enemy1 = create_hero(RED, TRICKSTER);
+    Hero* enemy2 = create_hero(RED, ARCHER);
+    Hero* enemy3 = create_hero(RED, SOLDIER);
+    Hero* enemy4 = create_hero(RED, ARCHER);
+    set_hero(game.board, 6, 'b', enemy1);
+    set_hero(game.board, 7, 'b', enemy2);
+    set_hero(game.board, 6, 'd', enemy3);
+    set_hero(game.board, 7, 'd', enemy4);  
+}
+
 Game init_game() {
-
     Box** board = init_board();
-
-    return (Game) {board, 'A', 'B'};
+    Player* player1 = malloc(sizeof(Player));
+    Player* player2 = malloc(sizeof(Player));
+    Game game =(Game) {board, player1, player2};
+    init_heros(game);
+    return game;
 }
 
 void deplace(Hero hero){
@@ -65,7 +86,7 @@ void choose_move(Box** board, int column, char line, Hero* hero) {
     set_hero(board, column, line, hero);
 }
 
-void playGame(Game game) {
+void play_game(Game game) {
     char* response1 = malloc(sizeof(char));
     char* response2 = malloc(sizeof(char));
     Box** board = game.board;
@@ -83,3 +104,19 @@ void playGame(Game game) {
     //choose_move(board, c+1, l, get_hero(board, c, l));    
     display_board(board);
 }
+
+void set_player(Game g, char* username, PlayerType type, int id){
+    switch(id){
+        case 1:
+            g.player1->username = username;
+            g.player1->type = type;
+            break;
+        case 2:
+            g.player2->username = username;
+            g.player2->type = type;
+            break;
+    }
+    
+}
+
+

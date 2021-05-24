@@ -1,5 +1,6 @@
 #include "main.h"
 #include "board.h"
+#include "player.h"
 
 #define BOX_WIDTH 7
 #define BOX_HEIGHT 5
@@ -7,8 +8,8 @@
 typedef struct
 {
     Box** board;
-    char Payer1;
-    char Player2;
+    Player* player1;
+    Player* player2;
 }Game;
 
 //Initialisation partie
@@ -33,4 +34,6 @@ int have_unit(Box** board, int column, char line);
 void choose_move(Box** board, int column, char line, Hero* hero);
 
 //Lance une partie
-void playGame(Game game);
+void play_game(Game game);
+
+void set_player(Game g, char* username, PlayerType type, int id);
