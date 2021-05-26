@@ -1,7 +1,7 @@
 #include "main.h"
 #include "game.h"
 
-int show_logo(){
+void show_logo(){
 	system("clear");
 	printf("\t\t\t\t\t _______  _______ _________ _______  _______ \n");
 	printf("\t\t\t\t\t| (    )|| (    \\/   ) (   | (    \\/| (    )|\n");
@@ -20,7 +20,6 @@ int show_logo(){
 	printf("\t\t\t\t\t| (_\\ \\ || (___) || (____/\\/\\____) |   | |\n");   
 	printf("\t\t\t\t\t(____\\/_)(_______)(_______/\\_______)   )_(\n"); 
 	printf("\n");
-	return 0;
 }
 
 int menu ( int argc, ... )
@@ -49,7 +48,6 @@ int menu ( int argc, ... )
         table[ i ] = va_arg ( list, char* );
     }
     va_end ( list );
- 
     do
     {
         for ( i = 0; i < argc; i++ )
