@@ -9,3 +9,5 @@ typedef struct{
 
 // create a box
 Box create_box(int x, char y, Hero* hero); 
+
+void free_box(Box box);

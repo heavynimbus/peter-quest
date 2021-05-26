@@ -16,3 +16,5 @@ Hero* get_hero(Box** board, int column, char line);
 
 //Return 0 (Ally), 1(Enemy), 2(none_type)
 int get_camp(Box** board, int column, char line);
+
+void free_board(Box** board);
