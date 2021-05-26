@@ -25,7 +25,9 @@ int show_logo(){
 
 int menu ( int argc, ... )
 {
+	// https://man7.org/linux/man-pages/man3/termios.3.html
     static struct termios oldMask, newMask;
+
     va_list list;
     char **table  = NULL;
  
@@ -37,7 +39,6 @@ int menu ( int argc, ... )
     newMask = oldMask;
     newMask.c_lflag &= ~(ICANON); // avoid <enter>
     newMask.c_lflag &= ~(ECHO); // hide text typed
- 
     tcsetattr( STDIN_FILENO, TCSANOW, &newMask );
  
     table = malloc ( sizeof ( char * ) * argc );
@@ -108,7 +109,7 @@ int main()
 			int selection2 = menu(3, "1 joueur", "2 joueurs", "retour");
 			switch(selection2)
 			{
-				case 0:
+				case 0: 	
 					printf("Cette fonctionnalité n'a pas encore été implémentée..\n");
 					getchar();
 					return main();
@@ -124,6 +125,7 @@ int main()
 					display_board(g.board);
 					// faire la suite du jeu 
 					menu(2,"Deplacer un pion", "Attaquer");
+					free_game(g);
 					return main();
 				case 2: return main();
 			}
@@ -134,5 +136,6 @@ int main()
 		case 2:
 			return 0;
 	}
+
 	return 0;
 }

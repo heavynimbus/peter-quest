@@ -37,3 +37,5 @@ void choose_move(Box** board, int column, char line, Hero* hero);
 void play_game(Game game);
 
 void set_player(Game g, char* username, PlayerType type, int id);
+
+void free_game(Game g);

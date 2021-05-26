@@ -31,6 +31,19 @@ Box** init_board()
 	return result;
 }
 
+char* get_value_with_color(Hero* hero)
+{	
+	char* result = calloc(255, sizeof(char));
+	switch(hero->type){
+		case BLUE: sprintf(result, "%s%c%s", BLUE_COLOR, get_char(hero->race->type), WHITE_COLOR);
+			break;
+		case RED: sprintf(result, "%s%c%s", RED_COLOR, get_char(hero->race->type), WHITE_COLOR);
+			break;
+		case NONE_HERO: sprintf(result, "%s%c%s", WHITE_COLOR, get_char(hero->race->type), WHITE_COLOR);
+			break;
+	}
+	return result;
+}
 
 void display_board(Box** board)
 {
@@ -42,12 +55,22 @@ void display_board(Box** board)
 	for(int i = 0; i < HEIGHT; i++){
 		
 		char* line_to_print = (char*)calloc(16, sizeof(char));
-		char values[WIDTH] = {0}; // init all values to 0
+		char** values = calloc(WIDTH, sizeof(char*)); // init all values to 0
 		for(int j = 0; j < WIDTH; j++)
 		{
-			values[j] = get_char(board[i][j].hero->race->type);
+			values[j] = get_value_with_color(board[i][j].hero);
 		}
-		sprintf(line_to_print, "%c\t|%c|%c|%c|%c|%c|%c|%c|", (char)('a'+ i) , values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
+		sprintf(line_to_print, "%c\t|%s|%s|%s|%s|%s|%s|%s|", (char)('a'+ i) ,values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
 		printf("\t\t\t\t\t\t%s\n\t\t\t\t\t\t%s\n", line_to_print, filling_line);
+	}
+}
+
+void free_board(Box** board){
+	for(int i = 0; i < HEIGHT; i++)
+	{
+		for (int j = 0; j < WIDTH; j++)
+		{
+			free_box(board[i][j]);
+		}
 	}
 }
