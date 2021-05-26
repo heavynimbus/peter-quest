@@ -1,21 +1,24 @@
 #include "game.h"
 
-void init_heros(Game game){
-    set_hero(game.board, 1, 'b', create_hero(BLUE, ARCHER));
-    set_hero(game.board, 2, 'b', create_hero(BLUE, SOLDIER));
-    set_hero(game.board, 1, 'd', create_hero(BLUE, ARCHER));
-    set_hero(game.board, 2, 'd', create_hero(BLUE, TRICKSTER));
-    set_hero(game.board, 6, 'b', create_hero(RED, TRICKSTER));
-    set_hero(game.board, 7, 'b', create_hero(RED, ARCHER));
-    set_hero(game.board, 6, 'd', create_hero(RED, SOLDIER));
-    set_hero(game.board, 7, 'd', create_hero(RED, ARCHER));  
+void init_heros(Game* game){
+    set_hero(game->board, 1, 'b', create_hero(BLUE, ARCHER));
+    set_hero(game->board, 2, 'b', create_hero(BLUE, SOLDIER));
+    set_hero(game->board, 1, 'd', create_hero(BLUE, ARCHER));
+    set_hero(game->board, 2, 'd', create_hero(BLUE, TRICKSTER));
+    set_hero(game->board, 6, 'b', create_hero(RED, TRICKSTER));
+    set_hero(game->board, 7, 'b', create_hero(RED, ARCHER));
+    set_hero(game->board, 6, 'd', create_hero(RED, SOLDIER));
+    set_hero(game->board, 7, 'd', create_hero(RED, ARCHER));  
 }
 
-Game init_game() {
+Game* init_game() {
     Box** board = init_board();
     Player* player1 = malloc(sizeof(Player));
     Player* player2 = malloc(sizeof(Player));
-    Game game =(Game) {board, player1, player2};
+    Game* game = malloc(sizeof(Game));
+    game->board = board;
+    game->player1 = player1;
+    game->player2 = player2;
     init_heros(game);
     return game;
 }
@@ -89,12 +92,21 @@ void set_player(Game g, char* username, PlayerType type, int id){
             g.player2->type = type;
             break;
     }
+}
+
+void run(Game* game){
+    display_player(game->player1);
+    display_player(game->player2);
     
+    display_board(game->board);
+    // faire la suite du jeu 
+    menu(2,"Deplacer un pion", "Attaquer");
 }
 
 
-void free_game(Game g){
-    free_board(g.board);
-    free_player(g.player1);
-    free_player(g.player2);
+void free_game(Game* g){
+    free_board(g->board);
+    free_player(g->player1);
+    free_player(g->player2);
+    free(g);
 }

@@ -13,7 +13,7 @@ typedef struct
 }Game;
 
 //Initialisation partie
-Game init_game();
+Game* init_game();
 
 //Deplace un héro
 void deplace(Hero hero);
@@ -38,4 +38,6 @@ void play_game(Game game);
 
 void set_player(Game g, char* username, PlayerType type, int id);
 
-void free_game(Game g);
+void free_game(Game* g);
+
+void run(Game* game);
