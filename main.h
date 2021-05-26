@@ -18,3 +18,5 @@
 #define BLACK_BACKGROUND "\033[0;40m"
 
 #define UNDERLINE "\033[0;4m"
+
+int menu(int argc, ...);
