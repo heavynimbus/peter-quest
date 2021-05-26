@@ -113,13 +113,63 @@ void set_player(Game g, char* username, PlayerType type, int id){
     }
 }
 
-void run(Game* game){
-    display_player(game->player1);
-    display_player(game->player2);
+void select_a_box(Game* game, int* height, int* width){
+    static struct termios oldMask, newMask;
+    show_logo();
+    tcgetattr ( STDIN_FILENO, &oldMask );
+    newMask = oldMask;
+    newMask.c_lflag &= ~(ICANON); // avoid <enter>
+    newMask.c_lflag &= ~(ECHO); // hide text typed
+    tcsetattr( STDIN_FILENO, TCSANOW, &newMask);
     
+    int column=0, line=0;
+    int choix;
+    do{
+        //show_logo();
+        display_board_underlined(game->board, line, column);
+        switch(choix = getchar()){
+            case 0x41:
+                line--;
+                break;
+            case 0x42:
+                line++;
+                break;
+            case 0x43:
+                column++;
+                break;
+            case 0x44:
+                column--;
+                break;
+        }
+        line = (line < 0)? line + BOX_HEIGHT: (line >= BOX_HEIGHT)? line - BOX_HEIGHT: line;
+        column = (column < 0)? column + BOX_WIDTH: (column >= BOX_WIDTH)? column - BOX_WIDTH: column;
+        column %= BOX_WIDTH;
+        printf("\e[%dA", HEIGHT*2 + 2);
+    }while(choix != '\n');
+
+    *height = line;
+    *width = column;
+    tcsetattr( STDIN_FILENO, TCSANOW, &oldMask);
+}
+
+
+void run(Game* game){
+    show_logo();
     display_board(game->board);
     // faire la suite du jeu 
-    menu(2,"Deplacer un pion", "Attaquer");
+    int choix = menu(2,"Deplacer un pion", "Attaquer");
+    switch(choix){
+        case 0:
+        {
+            int w;
+            int h;
+            select_a_box(game, &h, &w);
+            printf("Selected : %d %d\n", h, w);
+            break;
+        }
+        case 1:
+            break;
+    }
 }
 
 

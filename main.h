@@ -20,3 +20,5 @@
 #define UNDERLINE "\033[0;4m"
 
 int menu(int argc, ...);
+
+void show_logo();
