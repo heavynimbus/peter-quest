@@ -11,3 +11,5 @@ typedef struct{
 Box create_box(int x, char y, Hero* hero); 
 
 void free_box(Box box);
+
+char* get_hero_informations(Box box);
