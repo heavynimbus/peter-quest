@@ -24,6 +24,6 @@ char* get_hero_informations(Box box) {
 		health[i]= (i < box.hero->hp)? FULL_HEART: EMPTY_HEART;
 	}
 	health[nb_heart] = 0;
-	sprintf(result, "%c(%c,%d): %ls", get_char(box.hero->race->type), box.y, box.x, health);
+	sprintf(result, "%c(%c,%d): %ls %d%lc %d%lc", get_char(box.hero->race->type), box.y, box.x, health, box.hero->race->attack, SWORD, box.hero->race->defense, SHIELD);
 	return result;
 }
