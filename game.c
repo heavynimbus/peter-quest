@@ -149,7 +149,13 @@ void display_player_informations(Game* game){
     }
 }
 
-void select_a_box(Game* game, int* height, int* width){
+void display_message(char* message)
+{
+    set_pos(1,30);
+    printf("%50s%s", "", message);
+}
+
+void select_a_box(Game* game, int* height, int* width, char* message){
     static struct termios oldMask, newMask;
     show_logo();
     tcgetattr ( STDIN_FILENO, &oldMask );
@@ -157,12 +163,13 @@ void select_a_box(Game* game, int* height, int* width){
     newMask.c_lflag &= ~(ICANON); // avoid <enter>
     newMask.c_lflag &= ~(ECHO); // hide text typed
     tcsetattr( STDIN_FILENO, TCSANOW, &newMask);
-    
+
     int column=0, line=0;
     int choix;
     do{
         display_board_underlined(game->board, line, column);
         display_player_informations(game);
+        if(strlen(message) != 0) display_message(message);
         switch(choix = getchar()){
             case 0x41: // up key
                 line--;
@@ -180,8 +187,8 @@ void select_a_box(Game* game, int* height, int* width){
         line = (line < 0)? line + BOX_HEIGHT: (line >= BOX_HEIGHT)? line - BOX_HEIGHT: line;
         column = (column < 0)? column + BOX_WIDTH: (column >= BOX_WIDTH)? column - BOX_WIDTH: column;
         column %= BOX_WIDTH;
-        set_pos(1, 30);
-        printf("\e[%dA", HEIGHT*2 + 2);
+        set_pos(1, 31);
+        printf("\e[%dA", HEIGHT*2 + 3);
     }while(choix != '\n');
 
     *height = line;
@@ -189,17 +196,71 @@ void select_a_box(Game* game, int* height, int* width){
     tcsetattr( STDIN_FILENO, TCSANOW, &oldMask);
 }
 
+int update_game_state(Game* game, int* who_is_playing, int* is_game_finished){
+    int count1=0, count2=0;
+    for(int i = 0; i < BOX_HEIGHT; i++)
+    {
+        for (int j = 0; j < BOX_WIDTH; j++)
+        {
+            switch(game->board[i][j].hero->type)
+            {
+                case BLUE:
+                    count1 = (game->board[i][j].hero->hp > 0)? count1+1: count1;
+                    break;
+                case RED:
+                    count2 = (game->board[i][j].hero->hp > 0)? count2+1: count2;
+                    break;
+                case NONE_HERO:
+                    continue;
+            }
+        }
+    }
+    *is_game_finished = (count1 == 0 || count2 == 0 )? 1:0; 
+    *who_is_playing = (*who_is_playing == 1)?2:1;
+    return 0;
+}
 
-void run(Game* game){
-    show_logo();
-    display_board(game->board);
-    // faire la suite du jeu
-    printf("\n%50sJoueur 1 préparez vous !","");
-    getchar();
-    int w;
-    int h;
-    select_a_box(game, &h, &w);
-    printf("Selected : %d %d\n", h, w);
+Player* run(Game* game){
+    char* message = calloc(100, sizeof(char));
+    char* message_color;
+    int who_is_playing = 1, is_game_finished = 0;
+    Player* player;
+
+    do{
+        switch(who_is_playing)
+        {
+            case 1:
+                message_color = BLUE_COLOR;
+                player = game->player1;
+                break;
+            case 2:
+                message_color = RED_COLOR;
+                player = game->player2;
+                break;
+        }
+
+        show_logo();
+        display_board(game->board);
+        sprintf(message, "%sJoueur %d préparez vous !", message_color, who_is_playing);
+        display_message(message);
+        getchar();
+        
+        int h = -1, w = -1;
+        do{ 
+            sprintf(message, "%sVous devez choisir une de vos unités", message_color);
+            select_a_box(game, &h, &w, message);
+        }while(game->board[h][w].hero->type != ((who_is_playing==1)?BLUE:RED)); 
+
+        // recuperer les deplacements possible pour cette unité
+        // demander son deplacement
+        // deplacer l'unite
+        // si l'unite peut attaquer, attaquer
+        game->board[h][w].hero->hp=0;
+
+        update_game_state(game, &who_is_playing, &is_game_finished);
+    }while(!is_game_finished);
+    free(message);
+    return player; // the winner
 }
 
 

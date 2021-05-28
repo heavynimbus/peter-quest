@@ -3,6 +3,7 @@
 
 void show_logo(){
 	system("clear");
+	set_pos(1,1);
 	printf("%s", WHITE_COLOR);
 	printf("\t\t\t\t\t _______  _______ _________ _______  _______ \n");
 	printf("\t\t\t\t\t| (    )|| (    \\/   ) (   | (    \\/| (    )|\n");
@@ -93,6 +94,7 @@ void ask_player_name(Game* g, int id){
 	printf("Player %d\nEntrez votre nom:\t", id);
 	fgets(result, 30, stdin);
 	if(result[strlen(result)-1]=='\n')result[strlen(result)-1]=0;
+	if(strlen(result) == 0) sprintf(result, "player %d", id);
 	set_player(*g, result, HUMAN, id);
 }
 
@@ -119,7 +121,8 @@ int main()
 					g->board[1][0].hero->hp-=2;
 					ask_player_name(g, 1);
 					ask_player_name(g, 2);
-					run(g);
+					Player* winner = run(g);
+					printf("%s Vous avez gagné !!\n", winner->username);
     				free_game(g);
 					return main();
 				}
