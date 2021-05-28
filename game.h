@@ -22,7 +22,7 @@ void deplace(Hero hero);
 int can_deplace(Hero hero);
 
 //Attaque avec un hero
-void attack(Hero hero);
+int attack(Box** board, int x1, int y1, int x2, int y2);
 
 //Test si le hero peut attaquer
 int can_attack(Hero hero);
