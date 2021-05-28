@@ -16,3 +16,6 @@ Hero* create_hero(HeroType type, RaceType race);
 
 // display the hero for debug
 void display_hero(Hero* hero);
+
+// get race of hero
+RaceType get_race(Hero* hero);

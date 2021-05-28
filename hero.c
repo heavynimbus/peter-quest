@@ -39,3 +39,7 @@ void display_hero(Hero* hero){
 
 	} 
 }
+
+RaceType get_race(Hero* hero){
+	return hero->race->type;
+}

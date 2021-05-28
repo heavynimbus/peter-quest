@@ -16,10 +16,10 @@ typedef struct
 Game init_game();
 
 //Deplace un héro
-void deplace(Hero hero);
+void deplace(Box** board, Hero* hero, int column, char line);
 
 //Test si le héro peut se deplacer
-int can_deplace(Hero hero);
+int can_deplace(Box** board, Hero* hero, int column, char line);
 
 //Attaque avec un hero
 void attack(Hero hero);
@@ -31,9 +31,16 @@ int can_attack(Hero hero);
 int have_unit(Box** board, int column, char line);
 
 //Choisir le mouvement d'un héro
-void choose_move(Box** board, int column, char line, Hero* hero);
+Box* choose_move(Box** board, int column, char line, Hero* hero);
 
 //Lance une partie
 void play_game(Game game);
 
+//Lance une partie avec 2 joueurs
+void play_game_2p(Game game);
+
+//Modifier les valeurs d'un joueur
 void set_player(Game g, char* username, PlayerType type, int id);
+
+//Retourne la distance entre 2 unités
+int check_distance(int columnBox, int lineBox, int columnUnity, int lineUnity);

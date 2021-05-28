@@ -122,8 +122,17 @@ int main()
 					display_player(g.player2);
 					
 					display_board(g.board);
-					// faire la suite du jeu 
-					menu(2,"Deplacer un pion", "Attaquer");
+					// faire la suite du jeu
+					play_game_2p(g);
+					int selection3 = menu(2,"Deplacer un pion", "Attaquer");
+					switch(selection3)
+					{
+						case 0:
+							printf("Déplacement d'un pion\n");
+							return main();
+						case 1: 
+							return main();
+					}
 					return main();
 				case 2: return main();
 			}
