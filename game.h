@@ -41,4 +41,4 @@ void set_player(Game g, char* username, PlayerType type, int id);
 
 void free_game(Game* g);
 
-void run(Game* game);
+Player* run(Game* game);
