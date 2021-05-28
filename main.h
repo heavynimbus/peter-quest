@@ -25,6 +25,9 @@
 
 #define EMPTY_HEART  0x2661
 #define FULL_HEART 0x2665
+#define SWORD 0x2694
+#define SHIELD 0x1f6e1
+
 
 int menu(int argc, ...);
 
