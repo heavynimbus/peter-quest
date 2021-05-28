@@ -8,7 +8,7 @@ void init_heros(Game* game){
     set_hero(game->board, 6, 'b', create_hero(RED, TRICKSTER));
     set_hero(game->board, 7, 'b', create_hero(RED, ARCHER));
     set_hero(game->board, 6, 'd', create_hero(RED, SOLDIER));
-    set_hero(game->board, 7, 'd', create_hero(RED, ARCHER));  
+    set_hero(game->board, 7, 'd', create_hero(RED, ARCHER));
 }
 
 Game* init_game() {
@@ -94,6 +94,61 @@ void set_player(Game g, char* username, PlayerType type, int id){
     }
 }
 
+void display_hero_informations(Box box, int x, int y)
+{   
+    char* infos = get_hero_informations(box);
+    set_pos(x, y);
+    switch(box.hero->type){
+        case NONE_HERO:
+            return;
+        case RED:
+            printf("%s%s", RED_COLOR, infos);
+            break;
+        case BLUE:
+            printf("%s%s", BLUE_COLOR, infos);
+            break;
+    }
+}
+
+void display_player_informations(Game* game){
+    int x1 = 15, y1 = 18;
+    int x2 = 100, y2 = 18;
+
+    set_pos(x1, y1);
+    printf("%s%s", BLUE_BACKGROUND, game->player1->username);
+    x1 -= 5; y1 += 2;
+
+    set_pos(x2, y2);
+    printf("%s%s", RED_BACKGROUND, game->player2->username);
+    x2 -=5; y2 += 2;
+
+    for(int i = 0; i < BOX_HEIGHT; i++)
+    {
+        for(int j = 0; j < BOX_WIDTH; j++)
+        {
+            switch(game->board[i][j].hero->type)
+            {
+                case BLUE:
+                {
+                    display_hero_informations(game->board[i][j], x1, y1);
+                    y1 += 2;
+                    break;
+                }
+                case RED:
+                {
+                    display_hero_informations(game->board[i][j], x2, y2);
+                    y2 += 2;
+                    break;
+                }
+                case NONE_HERO:
+                {
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void select_a_box(Game* game, int* height, int* width){
     static struct termios oldMask, newMask;
     show_logo();
@@ -106,25 +161,26 @@ void select_a_box(Game* game, int* height, int* width){
     int column=0, line=0;
     int choix;
     do{
-        //show_logo();
         display_board_underlined(game->board, line, column);
+        display_player_informations(game);
         switch(choix = getchar()){
-            case 0x41:
+            case 0x41: // up key
                 line--;
                 break;
-            case 0x42:
+            case 0x42: // down key
                 line++;
                 break;
-            case 0x43:
+            case 0x43: // right key
                 column++;
                 break;
-            case 0x44:
+            case 0x44: // left key
                 column--;
                 break;
         }
         line = (line < 0)? line + BOX_HEIGHT: (line >= BOX_HEIGHT)? line - BOX_HEIGHT: line;
         column = (column < 0)? column + BOX_WIDTH: (column >= BOX_WIDTH)? column - BOX_WIDTH: column;
         column %= BOX_WIDTH;
+        set_pos(1, 30);
         printf("\e[%dA", HEIGHT*2 + 2);
     }while(choix != '\n');
 
@@ -137,20 +193,13 @@ void select_a_box(Game* game, int* height, int* width){
 void run(Game* game){
     show_logo();
     display_board(game->board);
-    // faire la suite du jeu 
-    int choix = menu(2,"Deplacer un pion", "Attaquer");
-    switch(choix){
-        case 0:
-        {
-            int w;
-            int h;
-            select_a_box(game, &h, &w);
-            printf("Selected : %d %d\n", h, w);
-            break;
-        }
-        case 1:
-            break;
-    }
+    // faire la suite du jeu
+    printf("\n%50sJoueur 1 préparez vous !","");
+    getchar();
+    int w;
+    int h;
+    select_a_box(game, &h, &w);
+    printf("Selected : %d %d\n", h, w);
 }
 
 

@@ -1,4 +1,5 @@
 #include "board.h"
+#include "screen.h"
 
 Hero* get_hero(Box** board, int column, char line){
 	return board[(int)(line-'a')][column-1].hero;
@@ -50,7 +51,7 @@ void display_board(Box** board)
 	const char* numbers_line = "\t 1 2 3 4 5 6 7";
 	const char* filling_line = "\t|-------------|";
 
-	printf("\t\t\t\t\t\t%s\n\t\t\t\t\t\t%s\n", numbers_line, filling_line);
+	printf("%s%48s%s\n%48s%s\n", WHITE_COLOR, "", numbers_line,"", filling_line);
 
 	for(int i = 0; i < HEIGHT; i++){
 		
@@ -61,7 +62,7 @@ void display_board(Box** board)
 			values[j] = get_value_with_color(board[i][j].hero);
 		}
 		sprintf(line_to_print, "%c\t|%s|%s|%s|%s|%s|%s|%s|", (char)('a'+ i) ,values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
-		printf("\t\t\t\t\t\t%s\n\t\t\t\t\t\t%s\n", line_to_print, filling_line);
+		printf("%48s%s\n%48s%s\n", "", line_to_print, "", filling_line);
 	}
 }
 
@@ -70,7 +71,7 @@ void display_board_underlined(Box** board, int height, int width)
 	const char* numbers_line = "\t 1 2 3 4 5 6 7";
 	const char* filling_line = "\t|-------------|";
 
-	printf("\t\t\t\t\t\t%s\n\t\t\t\t\t\t%s\n", numbers_line, filling_line);
+	printf("%s%48s%s\n\t\t\t\t\t\t%s\n", WHITE_COLOR, "", numbers_line, filling_line);
 
 	for(int i = 0; i < HEIGHT; i++){
 		
@@ -86,7 +87,7 @@ void display_board_underlined(Box** board, int height, int width)
 			}
 		}
 		sprintf(line_to_print, "%c\t|%s|%s|%s|%s|%s|%s|%s|", (char)('a'+ i) ,values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
-		printf("\t\t\t\t\t\t%s\n\t\t\t\t\t\t%s\n", line_to_print, filling_line);
+		printf("%48s%s\n%48s%s\n", "", line_to_print, "", filling_line);
 	}
 }
 

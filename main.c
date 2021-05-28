@@ -3,6 +3,7 @@
 
 void show_logo(){
 	system("clear");
+	printf("%s", WHITE_COLOR);
 	printf("\t\t\t\t\t _______  _______ _________ _______  _______ \n");
 	printf("\t\t\t\t\t| (    )|| (    \\/   ) (   | (    \\/| (    )|\n");
 	printf("\t\t\t\t\t| (____)|| (__       | |   | (__    | (____)|\n");
@@ -26,7 +27,6 @@ int menu ( int argc, ... )
 {
 	// https://man7.org/linux/man-pages/man3/termios.3.html
     static struct termios oldMask, newMask;
-
     va_list list;
     char **table  = NULL;
  
@@ -99,6 +99,8 @@ void ask_player_name(Game* g, int id){
 int main()
 {
 	show_logo();
+	setlocale(LC_CTYPE, "");
+
 	int selection1 = menu(3, "Jouer", "Regles du jeu", "Quitter");
 	switch(selection1)
 	{
@@ -114,6 +116,7 @@ int main()
 				case 1:
 				{
 					Game* g = init_game();
+					g->board[1][0].hero->hp-=2;
 					ask_player_name(g, 1);
 					ask_player_name(g, 2);
 					run(g);

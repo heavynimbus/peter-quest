@@ -1,6 +1,7 @@
 #include "main.h"
 #include "board.h"
 #include "player.h"
+#include "screen.h"
 
 #define BOX_WIDTH 7
 #define BOX_HEIGHT 5
