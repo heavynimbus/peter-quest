@@ -3,9 +3,6 @@
 #include "player.h"
 #include "screen.h"
 
-#define BOX_WIDTH 7
-#define BOX_HEIGHT 5
-
 typedef struct
 {
     Box** board;

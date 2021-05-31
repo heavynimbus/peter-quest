@@ -246,6 +246,75 @@ int update_game_state(Game* game, int* who_is_playing, int* is_game_finished){
     return 0;
 }
 
+
+/**
+    Safe free for a game
+*/
+void free_game(Game* g){
+    free_board(g->board);
+    free_player(g->player1);
+    free_player(g->player2);
+    free(g);
+}
+
+
+Box* get_neighbours(Box** board, int line, int column, int* nb_neighbours)
+{
+    int cpt = 0;
+    Box* neighbours = calloc(4, sizeof(Box));
+    if(line-1 >= 0) neighbours[cpt++] = board[line-1][column];
+    if(line+1 < HEIGHT) neighbours[cpt++] = board[line+1][column];
+    if(column-1 >= 0) neighbours[cpt++] = board[line][column-1];
+    if(column+1 < WIDTH) neighbours[cpt++] = board[line][column+1];
+    *nb_neighbours = cpt;
+    return neighbours;
+}
+
+int** get_moove_count(Box** board, int line, int column)
+{
+    int** result = calloc(HEIGHT, sizeof(int*));
+    for(int i = 0; i < HEIGHT; i++)
+    {
+        result[i] = calloc(WIDTH, sizeof(int));
+        for(int j = 0; j < WIDTH; j++)
+            result[i][j] = -2;
+    }
+
+    Box* list = malloc(sizeof(Box));
+    *list = board[line][column];
+    int nb_elements = 1, count = 0;
+
+    result[line][column] = count;
+    do{
+
+        count++;
+        int nb_elements_next_list = 4 * nb_elements, cpt = 0;
+        Box* next_list = calloc(nb_elements_next_list, sizeof(Box));
+        
+        for(int i = 0; i < nb_elements; i++)
+        {
+        
+            int nb_neighbours;
+            Box* neighbours = get_neighbours(board, list[i].line, list[i].column, &nb_neighbours);
+        
+            for(int j = 0; j < nb_neighbours; j ++)
+            {
+                if ((result[neighbours[j].line][neighbours[j].column] == -2) &&
+                    (board[neighbours[j].line][neighbours[j].column].hero->type == NONE_HERO))
+                {
+                    result[neighbours[j].line][neighbours[j].column] = count;
+                    next_list[cpt++] = neighbours[j];
+                }
+                else result[neighbours[j].line][neighbours[j].column] = -1;
+            }
+        }
+        free(list);
+        list = next_list;
+        nb_elements = cpt;
+    }while(nb_elements>0);
+    return result;
+}
+
 Player* run(Game* game){
     char* message = calloc(100, sizeof(char));
     char* message_color;
@@ -275,18 +344,31 @@ Player* run(Game* game){
         int attack_line = -1, attack_column = -1;
         int attack_res = -2, move_done = 0;
         do{
+            
             do{ 
                 sprintf(message, "%sVous devez choisir une de vos unités", message_color);
                 select_a_box(game, &initial_line, &initial_column, message);
             }while(game->board[initial_line][initial_column].hero->type != ((who_is_playing)?RED:BLUE));
 
+            int** moove_count = get_moove_count(game->board, initial_line, initial_column); 
+
             do{
                 sprintf(message, "%sVous devez choisir un deplacement", message_color);
                 select_a_box(game, &move_line, &move_column, message);
             }while(game->board[move_line][move_column].hero->type != NONE_HERO);
-            
             move(game->board, initial_line, initial_column, move_line, move_column);
             move_done = 1;
+            if(moove_count[move_line][move_column] <= game->board[initial_line][initial_column].hero->race->shifting)
+            {       
+                set_pos(1,1);
+                printf("Ouais");
+            }else{
+                show_logo();
+                display_board(game->board);
+                sprintf(message, "%sDeplacement maximal dépassé :/", message_color);
+                display_message(message);
+                getchar();
+            }
 
         }while(!move_done);
         // deplacer l'unite
@@ -320,15 +402,4 @@ Player* run(Game* game){
     }while(!is_game_finished);
     free(message);
     return player; // the winner
-}
-
-
-/**
-    Safe free for a game
-*/
-void free_game(Game* g){
-    free_board(g->board);
-    free_player(g->player1);
-    free_player(g->player2);
-    free(g);
 }

@@ -116,9 +116,9 @@ void ask_player_name(Game* g, int id){
 
 void display_debug(int** tab)
 {
-    for(int i = 0; i < BOX_HEIGHT; i++){
+    for(int i = 0; i < HEIGHT; i++){
         printf("[");
-        for(int j = 0; j < BOX_WIDTH; j++)
+        for(int j = 0; j < WIDTH; j++)
             printf("%d\t", tab[i][j]);
         printf("]\n");
     }
@@ -126,8 +126,8 @@ void display_debug(int** tab)
 
 int is_complete(int** array)
 {
-    for(int i = 0; i < BOX_HEIGHT; i++)
-        for(int j = 0; j < BOX_WIDTH; j++)
+    for(int i = 0; i < HEIGHT; i++)
+        for(int j = 0; j < WIDTH; j++)
             if (array[i][j] == -2)
                 return FALSE;
     return TRUE;
@@ -135,7 +135,7 @@ int is_complete(int** array)
 
 int main()
 {
-/*	show_logo();
+	show_logo();
 	setlocale(LC_CTYPE, "");
 
 	int selection1 = menu(3, "Jouer", "Regles du jeu", "Quitter");
@@ -167,33 +167,6 @@ int main()
 			return main();
 		case 2:
 			return 0;
-	}*/
-
-	// WIDTH = 5, HEIGHT = 7
-	Game* g = init_game();
-	int line = 1, column = 1;
-
-	int** result = calloc(HEIGHT, sizeof(int*));
-	for(int i = 0; i < HEIGHT; i++)
-	{
-		result[i] = calloc(WIDTH, sizeof(int));
-		for(int j = 0; j < WIDTH; j++)
-		{
-			result[i][j] = -2;
-		}
 	}
-
-	Box* list = malloc(sizeof(Box));
-	*list = g->board[line][column];
-	int nb_elements = 1;
-	do
-	{
-
-		printf("%d\n", nb_elements--);
-	}while(nb_elements>0);
-
-	display_board(g->board);
-	display_debug(result);
-
 	return 0;
 }

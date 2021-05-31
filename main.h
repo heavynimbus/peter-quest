@@ -27,6 +27,7 @@
 #define FULL_HEART 0x2665
 #define SWORD 0x2694
 #define SHIELD 0x1f6e1
+#define FOOT 0x1f6b6
 
 #define WIDTH 7
 #define HEIGHT 5
