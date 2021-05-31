@@ -1,5 +1,8 @@
 #include "game.h"
 
+/**
+    Set the heros positions for the beginning of the game
+*/
 void init_heros(Game* game){
     set_hero(game->board, 1, 'b', create_hero(BLUE, ARCHER));
     set_hero(game->board, 2, 'b', create_hero(BLUE, SOLDIER));
@@ -11,6 +14,9 @@ void init_heros(Game* game){
     set_hero(game->board, 7, 'd', create_hero(RED, ARCHER));
 }
 
+/**
+    Create a game and initialize it
+*/
 Game* init_game() {
     Box** board = init_board();
     Player* player1 = malloc(sizeof(Player));
@@ -23,21 +29,25 @@ Game* init_game() {
     return game;
 }
 
-void deplace(Hero hero){
-    display_hero(&hero);
-}
+/**
+    Swap the two heros from the boxes
 
-int can_deplace(Hero hero){
-    display_hero(&hero);
-    return FALSE;
-}
-
+    ! warning ! 
+    there is no verification, you have to do it before call this function
+*/
 void move(Box** board, int line1, int column1, int line2, int column2){
     Hero* save = board[line1][column1].hero;
     board[line1][column1].hero = board[line2][column2].hero;
     board[line2][column2].hero = save;
 }
 
+/**
+    The first hero (at line1, column1) attack the second and deals damages
+    reduced by the armor (min 1)
+
+    ! warning ! 
+    there is no verification, you have to do it before call this function  
+*/
 int attack(Box** board, int line1, int column1, int line2, int column2)
 {
     Hero* hero1 = board[line1][column1].hero;
@@ -52,31 +62,33 @@ int attack(Box** board, int line1, int column1, int line2, int column2)
     return 0;
 }
 
-int can_attack(Box** board, int line1, int column1)
+/**
+    Predicate 
+    return 1 (TRUE) if there is an enemy around him
+    return 0 (FALSE) if not 
+*/
+int can_attack(Box** board, int line, int column)
 {
-    Hero* hero = board[line1][column1].hero;
+    Hero* hero = board[line][column].hero;
+    if(hero->type == NONE_HERO) return FALSE;
+
     int scope =  hero->race->scope;
     HeroType ennemy_type = (hero->type == RED)? BLUE: RED;
     for(int i = 0; i < BOX_HEIGHT; i++)
     {
         for(int j = 0; j < BOX_WIDTH; j++)
         {
-            int len = line1 - i + column1 - j;
+            int len = line - i + column - j;
             len = (len < 0)? -len: len;
-            if (len <= scope && board[i][j].hero->type == ennemy_type) return 1;
+            if (len <= scope && board[i][j].hero->type == ennemy_type) return TRUE;
         }
-    }
-    return 0;
-}
-
-int have_unit(Box** board, int column, char line) {
-    Hero* resHero = get_hero(board, column, line);
-    if(get_char(resHero->race->type) != ' ') {
-        return TRUE;
     }
     return FALSE;
 }
 
+/**
+    Set the player to the game
+*/
 void set_player(Game g, char* username, PlayerType type, int id){
     switch(id){
         case 1:
@@ -90,6 +102,9 @@ void set_player(Game g, char* username, PlayerType type, int id){
     }
 }
 
+/**
+    Print the hero informations at x,y index 
+*/
 void display_hero_informations(Box box, int x, int y)
 {   
     char* infos = get_hero_informations(box);
@@ -106,6 +121,9 @@ void display_hero_informations(Box box, int x, int y)
     }
 }
 
+/**
+    print all the informations about the game
+*/
 void display_player_informations(Game* game){
     int x1 = 15, y1 = 18;
     int x2 = 100, y2 = 18;
@@ -145,12 +163,20 @@ void display_player_informations(Game* game){
     }
 }
 
+/**
+    print a message below the game
+*/
 void display_message(char* message)
 {
     set_pos(1,30);
     printf("%50s%s", "", message);
 }
 
+
+/**
+    This method is interactive the the user
+    In height (int*) and width (int*) arguments will be stocked the position selected by the user
+*/
 void select_a_box(Game* game, int* height, int* width, char* message){
     static struct termios oldMask, newMask;
     show_logo();
@@ -192,6 +218,9 @@ void select_a_box(Game* game, int* height, int* width, char* message){
     tcsetattr( STDIN_FILENO, TCSANOW, &oldMask);
 }
 
+/*
+    Check if the game is finished and change who is playing
+*/
 int update_game_state(Game* game, int* who_is_playing, int* is_game_finished){
     int count1=0, count2=0;
     for(int i = 0; i < BOX_HEIGHT; i++)
@@ -294,6 +323,9 @@ Player* run(Game* game){
 }
 
 
+/**
+    Safe free for a game
+*/
 void free_game(Game* g){
     free_board(g->board);
     free_player(g->player1);

@@ -67,12 +67,12 @@ void display_board(Box** board)
 	}
 }
 
-void display_board_underlined(Box** board, int height, int width)
+void display_board_underlined(Box** board, int line, int column)
 {
 	const char* numbers_line = "\t 1 2 3 4 5 6 7";
 	const char* filling_line = "\t|-------------|";
 
-	printf("%s%48s%s\n\t\t\t\t\t\t%s\n", WHITE_COLOR, "", numbers_line, filling_line);
+	printf("%s%48s%s\n%48s%s\n", WHITE_COLOR, "", numbers_line,"", filling_line);
 
 	for(int i = 0; i < HEIGHT; i++){
 		
@@ -102,9 +102,9 @@ void free_board(Box** board){
 	}
 }
 
-int kill(Box** board, int ligne, int column)
+int kill(Box** board, int line, int column)
 {
-	if(board[ligne][column].hero->type == NONE_HERO) return 0;
-	board[ligne][column].hero = create_hero(NONE_HERO, NONE_RACE);
+	if(board[line][column].hero->type == NONE_HERO) return 0;
+	board[line][column].hero = create_hero(NONE_HERO, NONE_RACE);
 	return 1;
 }

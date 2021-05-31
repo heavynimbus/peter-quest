@@ -1,6 +1,10 @@
 #include "main.h"
 #include "game.h"
 
+
+/**
+	Clear the screen and print "PETER QUEST" in ascii art
+*/
 void show_logo(){
 	system("clear");
 	set_pos(1,1);
@@ -24,6 +28,14 @@ void show_logo(){
 	printf("\n");
 }
 
+
+/**
+	Display an interactive menu in the console
+	agrc (int) : the count of arguments
+	... : a succession of char* arguments which can be selected
+
+	return (int) : the index of the selected element
+*/
 int menu ( int argc, ... )
 {
 	// https://man7.org/linux/man-pages/man3/termios.3.html
@@ -88,6 +100,10 @@ int menu ( int argc, ... )
     return ( choix );
 }
 
+
+/**
+	Ask the player's name
+*/
 void ask_player_name(Game* g, int id){
 	show_logo();
 	char* result = calloc(30, sizeof(char));
@@ -98,9 +114,28 @@ void ask_player_name(Game* g, int id){
 	set_player(*g, result, HUMAN, id);
 }
 
+void display_debug(int** tab)
+{
+    for(int i = 0; i < BOX_HEIGHT; i++){
+        printf("[");
+        for(int j = 0; j < BOX_WIDTH; j++)
+            printf("%d\t", tab[i][j]);
+        printf("]\n");
+    }
+}
+
+int is_complete(int** array)
+{
+    for(int i = 0; i < BOX_HEIGHT; i++)
+        for(int j = 0; j < BOX_WIDTH; j++)
+            if (array[i][j] == -2)
+                return FALSE;
+    return TRUE;
+}
+
 int main()
 {
-	show_logo();
+/*	show_logo();
 	setlocale(LC_CTYPE, "");
 
 	int selection1 = menu(3, "Jouer", "Regles du jeu", "Quitter");
@@ -132,7 +167,34 @@ int main()
 			return main();
 		case 2:
 			return 0;
+	}*/
+
+	// WIDTH = 5, HEIGHT = 7
+	Game* g = init_game();
+	int width = 7, height = 5;
+	int line = 1, column = 1;
+
+	int** result = calloc(height, sizeof(int*));
+	for(int i = 0; i < height; i++)
+	{
+		result[i] = calloc(width, sizeof(int));
+		for(int j = 0; j < width; j++)
+		{
+			result[i][j] = -2;
+		}
 	}
+
+	Box* list = malloc(sizeof(Box));
+	*list = g->board[line][column];
+	int nb_elements = 1;
+	do
+	{
+
+		printf("%d\n", nb_elements--);
+	}while(nb_elements>0);
+
+	display_board(g->board);
+	display_debug(result);
 
 	return 0;
 }

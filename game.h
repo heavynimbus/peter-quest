@@ -16,21 +16,6 @@ typedef struct
 //Initialisation partie
 Game* init_game();
 
-//Deplace un héro
-void deplace(Hero hero);
-
-//Test si le héro peut se deplacer
-int can_deplace(Hero hero);
-
-//Attaque avec un hero
-int attack(Box** board, int x1, int y1, int x2, int y2);
-
-//Test la présence d'un héro dans une case 
-int have_unit(Box** board, int column, char line);
-
-//Lance une partie
-void play_game(Game game);
-
 void set_player(Game g, char* username, PlayerType type, int id);
 
 void free_game(Game* g);
