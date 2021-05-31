@@ -74,9 +74,9 @@ int can_attack(Box** board, int line, int column)
 
     int scope =  hero->race->scope;
     HeroType ennemy_type = (hero->type == RED)? BLUE: RED;
-    for(int i = 0; i < BOX_HEIGHT; i++)
+    for(int i = 0; i < HEIGHT; i++)
     {
-        for(int j = 0; j < BOX_WIDTH; j++)
+        for(int j = 0; j < WIDTH; j++)
         {
             int len = line - i + column - j;
             len = (len < 0)? -len: len;
@@ -136,9 +136,9 @@ void display_player_informations(Game* game){
     printf("%s%s", RED_BACKGROUND, game->player2->username);
     x2 -=5; y2 += 2;
 
-    for(int i = 0; i < BOX_HEIGHT; i++)
+    for(int i = 0; i < HEIGHT; i++)
     {
-        for(int j = 0; j < BOX_WIDTH; j++)
+        for(int j = 0; j < WIDTH; j++)
         {
             switch(game->board[i][j].hero->type)
             {
@@ -206,9 +206,9 @@ void select_a_box(Game* game, int* height, int* width, char* message){
                 column--;
                 break;
         }
-        line = (line < 0)? line + BOX_HEIGHT: (line >= BOX_HEIGHT)? line - BOX_HEIGHT: line;
-        column = (column < 0)? column + BOX_WIDTH: (column >= BOX_WIDTH)? column - BOX_WIDTH: column;
-        column %= BOX_WIDTH;
+        line = (line < 0)? line + HEIGHT: (line >= HEIGHT)? line - HEIGHT: line;
+        column = (column < 0)? column + WIDTH: (column >= WIDTH)? column - WIDTH: column;
+        column %= WIDTH;
         set_pos(1, 31);
         printf("\e[%dA", HEIGHT*2 + 3);
     }while(choix != '\n');
@@ -223,9 +223,9 @@ void select_a_box(Game* game, int* height, int* width, char* message){
 */
 int update_game_state(Game* game, int* who_is_playing, int* is_game_finished){
     int count1=0, count2=0;
-    for(int i = 0; i < BOX_HEIGHT; i++)
+    for(int i = 0; i < HEIGHT; i++)
     {
-        for (int j = 0; j < BOX_WIDTH; j++)
+        for (int j = 0; j < WIDTH; j++)
         {
             switch(game->board[i][j].hero->type)
             {

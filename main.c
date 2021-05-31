@@ -171,14 +171,13 @@ int main()
 
 	// WIDTH = 5, HEIGHT = 7
 	Game* g = init_game();
-	int width = 7, height = 5;
 	int line = 1, column = 1;
 
-	int** result = calloc(height, sizeof(int*));
-	for(int i = 0; i < height; i++)
+	int** result = calloc(HEIGHT, sizeof(int*));
+	for(int i = 0; i < HEIGHT; i++)
 	{
-		result[i] = calloc(width, sizeof(int));
-		for(int j = 0; j < width; j++)
+		result[i] = calloc(WIDTH, sizeof(int));
+		for(int j = 0; j < WIDTH; j++)
 		{
 			result[i][j] = -2;
 		}

@@ -1,14 +1,6 @@
 #include "board.h"
 #include "screen.h"
 
-Hero* get_hero(Box** board, int column, char line){
-	return board[(int)(line-'a')][column-1].hero;
-}
-
-int get_camp(Box** board, int column, char line){
-	Hero* hero = get_hero(board, column, line);
-	return hero->type;
-}
 
 void  set_hero(Box** board, int column, char line, Hero* hero)
 {
@@ -23,7 +15,7 @@ Box** init_board()
 		Box* line = (Box*) calloc(WIDTH, sizeof(Box));
 		for(int j = 0; j < WIDTH; j++)
 		{
-			line[j] = create_box( (j + 1), ('a' + i), create_hero(NONE_HERO, NONE_RACE));
+			line[j] = create_box(i, j, create_hero(NONE_HERO, NONE_RACE));
 		}
 		result[i] = line;
 	}
@@ -81,7 +73,7 @@ void display_board_underlined(Box** board, int line, int column)
 		for(int j = 0; j < WIDTH; j++)
 		{	
 			values[j] = calloc(255, sizeof(char));
-			if (i == height && j == width){
+			if (i == line && j == column){
 				sprintf(values[j], "%s%c%s", UNDERLINE, get_char(board[i][j].hero->race->type), WHITE_COLOR);
 			}else{
 				values[j] = get_value_with_color(board[i][j].hero);

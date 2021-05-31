@@ -27,3 +27,19 @@
 #define FULL_HEART 0x2665
 #define SWORD 0x2694
 #define SHIELD 0x1f6e1
+
+#define WIDTH 7
+#define HEIGHT 5
+
+/**
+	Display an interactive menu in the console
+	agrc (int) : the count of arguments
+	... : a succession of char* arguments which can be selected
+
+	return (int) : the index of the selected element
+*/
+int menu(int argc, ...);
+
+
+// Clear the screen and print "PETER QUEST" in ASCII art
+void show_logo();

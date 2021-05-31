@@ -3,12 +3,12 @@
 
 typedef struct{
 	Hero* hero;
-	int x;
-	char y;
+	int line;
+	int column;
 }Box;
 
 // create a box
-Box create_box(int x, char y, Hero* hero); 
+Box create_box(int line, int column, Hero* hero); 
 
 void free_box(Box box);
 

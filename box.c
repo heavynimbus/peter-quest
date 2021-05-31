@@ -1,13 +1,8 @@
 #include "box.h"
 
-Box create_box(int x, char y, Hero* hero)
+Box create_box(int line, int column, Hero* hero)
 {
-	return (Box){hero, x, y};
-}
-
-int contains_hero(Box box)
-{
-	return box.hero != NULL;
+	return (Box){hero, line, column};
 }
 
 void free_box(Box box)
@@ -24,6 +19,6 @@ char* get_hero_informations(Box box) {
 		health[i]= (i < box.hero->hp)? FULL_HEART: EMPTY_HEART;
 	}
 	health[nb_heart] = 0;
-	sprintf(result, "%c(%c,%d): %ls %d%lc %d%lc", get_char(box.hero->race->type), box.y, box.x, health, box.hero->race->attack, SWORD, box.hero->race->defense, SHIELD);
+	sprintf(result, "%c(%c,%d): %ls %d%lc %d%lc", get_char(box.hero->race->type), box.line + 'a', box.column + 1, health, box.hero->race->attack, SWORD, box.hero->race->defense, SHIELD);
 	return result;
 }
