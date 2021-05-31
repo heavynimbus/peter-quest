@@ -44,7 +44,8 @@ int attack(Box** board, int line1, int column1, int line2, int column2)
     int len = line1 - line2 + column1 - column2;
     len = (len < 0)? -len: len;
     if (len > scope) return -1;
-    hero2->hp = (hero2->race->defense < damage)? hero2->hp - damage + hero2->race->defense: hero2->hp-1;      
+    hero2->hp = (hero2->race->defense < damage)? hero2->hp - damage + hero2->race->defense: hero2->hp-1;   
+    if(hero2->hp <= 0) return 1;   
     return 0;
 }
 
@@ -260,6 +261,8 @@ Player* run(Game* game){
             // recuperer les deplacements possible pour cette unité
             // int attack(Box** board, int x1, int y1, int x2, int y2)
             attack_res = attack(game->board, h1, w1, h2, w2);
+            if(game->board[h2][w2].hero->hp <= 0) printf("il est mort\n");
+            else attack(game->board, h2, w2, h1, w1);
         }while(attack_res < 0);
         
         
