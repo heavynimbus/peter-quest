@@ -129,8 +129,7 @@ int main()
 			}
 			break;
 		case 1:
-			printf("Regles du jeu\n");
-			break;
+			return main();
 		case 2:
 			return 0;
 	}

@@ -20,3 +20,5 @@ Hero* get_hero(Box** board, int column, char line);
 int get_camp(Box** board, int column, char line);
 
 void free_board(Box** board);
+
+int kill(Box** board, int line, int column);

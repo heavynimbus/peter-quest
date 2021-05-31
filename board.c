@@ -100,3 +100,10 @@ void free_board(Box** board){
 		}
 	}
 }
+
+int kill(Box** board, int ligne, int column)
+{
+	if(board[ligne][column].hero->type == NONE_HERO) return 0;
+	board[ligne][column].hero = create_hero(NONE_HERO, NONE_RACE);
+	return 1;
+}
