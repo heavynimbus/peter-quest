@@ -2,7 +2,7 @@
 
 void init_heros(Game* game){
     set_hero(game->board, 1, 'b', create_hero(BLUE, ARCHER));
-    set_hero(game->board, 2, 'b', create_hero(BLUE, SOLDIER));
+    set_hero(game->board, 5, 'b', create_hero(BLUE, SOLDIER));
     set_hero(game->board, 1, 'd', create_hero(BLUE, ARCHER));
     set_hero(game->board, 2, 'd', create_hero(BLUE, TRICKSTER));
     set_hero(game->board, 6, 'b', create_hero(RED, TRICKSTER));
@@ -33,34 +33,19 @@ int can_deplace(Hero hero){
 }
 
 
-//TODO : add la fatigue + gestion de la portée.
-int attack(Box** board, int x1, int y1, int x2, int y2)
+int attack(Box** board, int line1, int column1, int line2, int column2)
 {
-
-    Hero* hero1 = get_hero(board, y1, x1);
-    Hero* hero2 = get_hero(board, y2, x2);
+    Hero* hero1 = board[line1][column1].hero;
+    Hero* hero2 = board[line2][column2].hero;
+    display_hero(hero1);
+    display_hero(hero2);
     int damage = hero1->race->attack;
     int scope = hero1->race->scope;
-    int len = x1 - x2 + y1 - y2;
-    printf("attack : %d\n", damage);
-    printf("pv du hero2 : %d\n", hero2->hp);
-
-    if (len > scope) {
-        return -1;
-    } else {
-        if (hero2->race->defense < damage) {
-        hero2->hp = hero2->hp - damage + hero2->race->defense;
-        } else {
-            printf("La défense de la cible est trop élevée\n");
-        }
-        return 0;
-    }
-    
-    
-    display_hero(hero2);
-
+    int len = line1 - line2 + column1 - column2;
+    len = (len < 0)? -len: len;
+    if (len > scope) return -1;
+    hero2->hp = (hero2->race->defense < damage)? hero2->hp - damage + hero2->race->defense: hero2->hp-1;      
     return 0;
-
 }
 
 int can_attack(Hero hero){
@@ -216,46 +201,68 @@ int update_game_state(Game* game, int* who_is_playing, int* is_game_finished){
         }
     }
     *is_game_finished = (count1 == 0 || count2 == 0 )? 1:0; 
-    *who_is_playing = (*who_is_playing == 1)?2:1;
+    *who_is_playing = (*who_is_playing)?0:1;
     return 0;
 }
 
 Player* run(Game* game){
     char* message = calloc(100, sizeof(char));
     char* message_color;
-    int who_is_playing = 1, is_game_finished = 0;
+    int who_is_playing = 0, is_game_finished = 0;
     Player* player;
 
     do{
-        switch(who_is_playing)
+        if(who_is_playing)
         {
-            case 1:
-                message_color = BLUE_COLOR;
+            message_color = RED_COLOR;
+            player = game->player2;
+        }else{
+            message_color = BLUE_COLOR;
                 player = game->player1;
-                break;
-            case 2:
-                message_color = RED_COLOR;
-                player = game->player2;
-                break;
         }
 
         show_logo();
         display_board(game->board);
-        sprintf(message, "%sJoueur %d préparez vous !", message_color, who_is_playing);
+        sprintf(message, "%s%s préparez vous !", message_color, (who_is_playing)?game->player2->username: game->player1->username);
         display_message(message);
         getchar();
         
-        int h = -1, w = -1;
-        do{ 
-            sprintf(message, "%sVous devez choisir une de vos unités", message_color);
-            select_a_box(game, &h, &w, message);
-        }while(game->board[h][w].hero->type != ((who_is_playing==1)?BLUE:RED)); 
-
-        // recuperer les deplacements possible pour cette unité
+        // TODO
         // demander son deplacement
         // deplacer l'unite
         // si l'unite peut attaquer, attaquer
-        game->board[h][w].hero->hp=0;
+
+
+        //attaque
+        int h1 = -1, w1 = -1, h2 = -1, w2 = -1, attack_res = -2;
+        do
+        {
+            if(attack_res > -2)
+            {
+                show_logo();
+                display_board(game->board);
+                sprintf(message, "%sL'unité ennemi est trop loin, choisissez une autre unité", message_color);
+                display_message(message);
+                getchar();
+            }
+
+            do{ 
+                sprintf(message, "%sVous devez choisir une de vos unités", message_color);
+                select_a_box(game, &h1, &w1, message);
+            }while(game->board[h1][w1].hero->type != ((who_is_playing)?RED:BLUE)); 
+            
+            do{ 
+                sprintf(message, "%sVous devez choisir une unité ennemie", message_color);
+                select_a_box(game, &h2, &w2, message);
+            }while(game->board[h2][w2].hero->type != ((who_is_playing)?BLUE:RED)); 
+            
+
+            // recuperer les deplacements possible pour cette unité
+            // int attack(Box** board, int x1, int y1, int x2, int y2)
+            attack_res = attack(game->board, h1, w1, h2, w2);
+        }while(attack_res < 0);
+        
+        
 
         update_game_state(game, &who_is_playing, &is_game_finished);
     }while(!is_game_finished);

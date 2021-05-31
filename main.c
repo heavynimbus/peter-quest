@@ -118,7 +118,6 @@ int main()
 				case 1:
 				{
 					Game* g = init_game();
-					g->board[1][0].hero->hp-=2;
 					ask_player_name(g, 1);
 					ask_player_name(g, 2);
 					Player* winner = run(g);
