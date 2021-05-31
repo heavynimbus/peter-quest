@@ -53,6 +53,7 @@ void display_board(Box** board)
 
 	printf("%s%48s%s\n%48s%s\n", WHITE_COLOR, "", numbers_line,"", filling_line);
 
+
 	for(int i = 0; i < HEIGHT; i++){
 		
 		char* line_to_print = (char*)calloc(16, sizeof(char));

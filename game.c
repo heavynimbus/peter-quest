@@ -212,6 +212,7 @@ int update_game_state(Game* game, int* who_is_playing, int* is_game_finished){
         }
     }
     *is_game_finished = (count1 == 0 || count2 == 0 )? 1:0; 
+
     *who_is_playing = (*who_is_playing)?0:1;
     return 0;
 }
