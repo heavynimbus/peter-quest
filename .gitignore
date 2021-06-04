@@ -1,4 +1,4 @@
 
 *.o
-
+*.ignore
 peter-quest

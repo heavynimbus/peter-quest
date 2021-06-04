@@ -10,3 +10,5 @@ typedef struct{
 }Player;
 
 void display_player(Player* player);
+
+void free_player(Player* player);

@@ -34,7 +34,7 @@ char get_char(RaceType type){
 	switch(type)
 	{
 		case TRICKSTER:
-			return 'T';
+			return 'F';
 		case SOLDIER:
 			return 'S';
 		case ARCHER:

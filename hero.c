@@ -39,3 +39,10 @@ void display_hero(Hero* hero){
 
 	} 
 }
+
+
+
+void free_hero(Hero* hero){
+	free(hero->race);
+	free(hero);
+}

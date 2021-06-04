@@ -16,3 +16,5 @@ Hero* create_hero(HeroType type, RaceType race);
 
 // display the hero for debug
 void display_hero(Hero* hero);
+
+void free_hero(Hero* hero);
