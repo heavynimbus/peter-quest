@@ -5,7 +5,6 @@ Hero* create_hero(HeroType type, RaceType race){
 	result->type = type;
 	result->race = create_race(race);
 	result->hp = result->race->max_hp;
-	result->is_tired = 0;
 	return result;
 }
 

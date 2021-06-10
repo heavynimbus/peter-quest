@@ -4,16 +4,8 @@
 
 
 // create and initialize a board
-Box** init_board();
+Box** init_board(int config_height, int config_width);
 
 // display used for the game
-void display_board(Box** board);
-
-void display_board_underlined(Box** board, int line, int column);
-
-void set_hero(Box** board, int column, char line, Hero* hero);
-
-void free_board(Box** board);
-
-int kill(Box** board, int line, int column);
+void display_board(Box** board, int config_height, int config_width);
 

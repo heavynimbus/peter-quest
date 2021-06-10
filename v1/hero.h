@@ -9,7 +9,6 @@ typedef struct{
 	HeroType type;
 	Race* race;
 	int hp;
-	int is_tired;
 }Hero;
 
 // create an hero

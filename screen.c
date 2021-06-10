@@ -1,47 +1,115 @@
 #include "screen.h"
 
-int get_pos(int *y, int *x)
+/**
+    Clear the screen and print "PETER QUEST" in ascii art
+*/
+void show_logo()
 {
-    char buffer[30] = {0};
-    int ret, i, pow;
-    char ch;
+    char* logo[] = {
+        " _______  _______ _________ _______  _______ ",
+        "| (    )|| (    \\/   ) (   | (    \\/| (    )|",
+        "| (____)|| (__       | |   | (__    | (____)|",
+        "|  _____)|  __)      | |   |  __)   |     __)",
+        "| (      | (         | |   | (      | (\\ (",
+        "| )      | (____/\\   | |   | (____/\\| ) \\ \\__",
+        "|/       (_______/   )_(   (_______/|/   \\__/",
+        " _______           _______  _______ _________",
+        "(  ___  )|\\     /|(  ____ \\(  ____ \\__   __/",
+        "| (   ) || )   ( || (    \\/| (    \\/   ) (",
+        "| |   | || |   | || (__    | (_____    | |",
+        "| |   | || |   | ||  __)   (_____  )   | |",
+        "| | /\\| || |   | || (            ) |   | |",
+        "| (_\\ \\ || (___) || (____/\\/\\____) |   | |",
+        "(____\\/_)(_______)(_______/\\_______)   )_(\n"
+    };
 
-    *y = 0; *x = 0;
-
-    struct termios newmask, restore;
-
-    tcgetattr(0, &newmask);
-    tcgetattr(0, &restore);
-    newmask.c_lflag &= ~(ICANON|ECHO);
-    tcsetattr(0, TCSANOW, &newmask);
-
-    write(1, "\033[6n", 4);
-
-    for( i = 0, ch = 0; ch != 'R'; i++ )
+    int screen_height, screen_width;
+    get_screen_dimensions(&screen_height, &screen_width);
+    
+    system("clear");
+    for(int i = 0; i < 15; i++)
     {
-        ret = read(0, &ch, 1);
-        if ( !ret ) 
+        set_pos((screen_width-47)/2, i + 1);
+        printf("%s", logo[i]);
+    }
+}
+
+/**
+    Display an interactive menu in the console
+    agrc (int) : the count of arguments
+    ... : a succession of char* arguments which can be selected
+
+    return (int) : the index of the selected element
+*/
+int menu ( int argc, ... )
+{
+    // https://man7.org/linux/man-pages/man3/termios.3.html
+    show_logo();
+    static struct termios oldMask, newMask;
+    va_list list;
+    char **table  = NULL;
+ 
+    int i = 0;
+    int choix = -1;
+    int position = 0;
+ 
+    tcgetattr ( STDIN_FILENO, &oldMask );
+    newMask = oldMask;
+    newMask.c_lflag &= ~(ICANON); // avoid <enter>
+    newMask.c_lflag &= ~(ECHO); // hide text typed
+    tcsetattr( STDIN_FILENO, TCSANOW, &newMask );
+ 
+    table = malloc ( sizeof ( char * ) * argc );
+ 
+    va_start ( list, argc );
+    for ( i = 0; i < argc; i++ )
+    {
+        table[ i ] = va_arg ( list, char* );
+    }
+    va_end ( list );
+    do
+    {
+        for ( i = 0; i < argc; i++ )
         {
-            tcsetattr(0, TCSANOW, &restore);
-            fprintf(stderr, "getpos: error reading response!\n");
-            return 1;
+            printf ( " \t\t\t\t\t\t\t%c %s\n", ( position == i )?'>':' ', table[ i ] );
         }
-        buffer[i] = ch;
-        printf("buffer[%d]: \t%c \t%d\n", i, ch, ch);
+         
+        switch ( i = getchar ( ) )
+        {
+            case 0x41:
+            { // up key is : 0x1b5b41
+                position = ( position - 1 + argc ) % argc;
+                break;
+            }
+            case 0x42:
+            { // down key is : 0x1b5b42
+                position = ( position + 1 ) % argc;
+                break;
+            }
+            case '\n':
+            {
+                choix = position;
+                break;
+            }
+        }
+        if ( choix < 0 )
+        {
+            printf ( "\e[%dA", argc );
+        }
     }
+    while ( choix < 0 );
+ 
+    free ( table );
+ 
+    tcsetattr( STDIN_FILENO, TCSANOW, &oldMask );
+ 
+    return ( choix );
+}
 
-    if (i < 2) {
-        tcsetattr(0, TCSANOW, &restore);
-        printf("i < 2\n");
-        return(1);
-    }
-
-    for( i -= 2, pow = 1; buffer[i] != ';'; i--, pow *= 10)
-        *x = *x + ( buffer[i] - '0' ) * pow;
-
-    for( i-- , pow = 1; buffer[i] != '['; i--, pow *= 10)
-        *y = *y + ( buffer[i] - '0' ) * pow;
-
-    tcsetattr(0, TCSANOW, &restore);
-    return 0;
+void get_screen_dimensions(int* height, int* width)
+{
+    static struct winsize w;
+    ioctl(0, TIOCGWINSZ, &w);
+    *height = w.ws_row;
+    *width = w.ws_col;
 }

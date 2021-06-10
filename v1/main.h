@@ -6,7 +6,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
-#include <sys/ioctl.h>
 
 
 #define TRUE 1
@@ -30,19 +29,18 @@
 #define SHIELD 0x1f6e1
 #define FOOT 0x1f6b6
 
-#define TOP_LEFT_CORNER 0x2554
-#define TOP_RIGHT_CORNER 0x2557
-#define TOP_MIDDLE 0x2564
+#define WIDTH 7
+#define HEIGHT 5
 
-#define BOTTOM_LEFT_CORNER 0x255A
-#define BOTTOM_RIGHT_CORNER 0X255D
-#define BOTTOM_MIDDLE 0x2567
+/**
+	Display an interactive menu in the console
+	agrc (int) : the count of arguments
+	... : a succession of char* arguments which can be selected
 
-#define FILLING_LEFT 0x255f
-#define FILLING_RIGHT 0x2562
-#define FILLING_MIDDLE 0x253c
+	return (int) : the index of the selected element
+*/
+int menu(int argc, ...);
 
-#define DOUBLE_HORIZONTAL 0x2550
-#define SIMPLE_HORIZONTAL 0x2500
-#define DOUBLE_VERTICAL 0x2551
-#define SIMPLE_VERTICAL 0x2502
+
+// Clear the screen and print "PETER QUEST" in ASCII art
+void show_logo();
