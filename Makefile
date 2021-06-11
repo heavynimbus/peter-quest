@@ -29,6 +29,9 @@ player.o: player.c player.h main.h
 screen.o: screen.c screen.h
 	gcc $(FLAGS) $<
 	
+ia.o: ia.c ia.h game.h
+	gcc $(FLAGS) $<
+
 clean:
 	rm -f *.o
 
