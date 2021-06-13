@@ -29,6 +29,7 @@
 #define SWORD 0x2694
 #define SHIELD 0x1f6e1
 #define FOOT 0x1f6b6
+#define SLEEP 0x1F4A4
 
 #define TOP_LEFT_CORNER 0x2554
 #define TOP_RIGHT_CORNER 0x2557
@@ -46,3 +47,5 @@
 #define SIMPLE_HORIZONTAL 0x2500
 #define DOUBLE_VERTICAL 0x2551
 #define SIMPLE_VERTICAL 0x2502
+
+void between(int* value, int min, int max);

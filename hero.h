@@ -19,3 +19,5 @@ Hero* create_hero(HeroType type, RaceType race);
 void display_hero(Hero* hero);
 
 void free_hero(Hero* hero);
+
+void attack(Hero* ally, Hero* enemy);

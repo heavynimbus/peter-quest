@@ -47,11 +47,6 @@ void set_config(char* config_file_path, int height, int width)
 	fclose(config_file);
 }
 
-void between(int* value, int min, int max)
-{
-	if (*value < min) *value = max;
-	if (*value > max) *value = min;
-}
 
 void option_menu(int* config_height, int* config_width)
 {
@@ -83,7 +78,7 @@ void option_menu(int* config_height, int* config_width)
 				break;
 		}
 		between(config_height, 5, 15);
-		between(config_width, 7, 20);
+		between(config_width, 7, 13);
 		if(choice != '\n')  printf ( "\e[%dA", 1 );
 	}while(choice != '\n');
     tcsetattr( STDIN_FILENO, TCSANOW, &oldMask );

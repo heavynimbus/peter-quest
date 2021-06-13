@@ -34,6 +34,24 @@ void show_logo()
     }
 }
 
+void display_messages(int argc, ...)
+{
+    int screen_height, screen_width;
+    get_screen_dimensions(&screen_height, &screen_width);
+    
+    char* message;
+
+    va_list list;    
+    va_start ( list, argc );
+    for (int i = 0; i < argc; i++ )
+    {
+        message = va_arg ( list, char* );
+        
+        set_pos((int)((screen_width - strlen(message))/2), 3+i);
+        printf("%s\n", message);
+    }
+}
+
 /**
     Display an interactive menu in the console
     agrc (int) : the count of arguments
@@ -59,6 +77,9 @@ int menu ( int argc, ... )
     newMask.c_lflag &= ~(ECHO); // hide text typed
     tcsetattr( STDIN_FILENO, TCSANOW, &newMask );
  
+    int screen_height, screen_width;
+    get_screen_dimensions(&screen_height, &screen_width);
+    
     table = malloc ( sizeof ( char * ) * argc );
  
     va_start ( list, argc );
@@ -71,7 +92,8 @@ int menu ( int argc, ... )
     {
         for ( i = 0; i < argc; i++ )
         {
-            printf ( " \t\t\t\t\t\t\t%c %s\n", ( position == i )?'>':' ', table[ i ] );
+            for(int j = 0; j < (screen_width/2)-10; j++)printf(" ");
+            printf ( "%c %s\n", ( position == i )?'>':' ', table[ i ] );
         }
          
         switch ( i = getchar ( ) )

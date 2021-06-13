@@ -47,3 +47,10 @@ void free_hero(Hero* hero){
 	free(hero->race);
 	free(hero);
 }
+
+void attack(Hero* ally, Hero* enemy)
+{
+	int damages = ally->race->attack - enemy->race->defense;
+	if(damages <= 0) damages = 1;
+	enemy->hp -= damages;
+}
