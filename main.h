@@ -44,3 +44,5 @@ int menu(int argc, ...);
 
 // Clear the screen and print "PETER QUEST" in ASCII art
 void show_logo();
+
+void display_debug(int** tab);

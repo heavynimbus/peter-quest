@@ -100,3 +100,64 @@ int kill(Box** board, int line, int column)
 	board[line][column].hero = create_hero(NONE_HERO, NONE_RACE);
 	return 1;
 }
+
+Box** copy_board(Box** board) {
+    Box** board_copied = init_board();
+    board_copied = board;
+    return board_copied;
+}
+
+int** get_scope_count(Box** board, int line, int column)
+{
+    int** result = calloc(HEIGHT, sizeof(int*));
+    for(int i = 0; i < HEIGHT; i++)
+    {
+        result[i] = calloc(WIDTH, sizeof(int));
+        for(int j = 0; j < WIDTH; j++)
+            result[i][j] = -2;
+    }
+
+    Box* list = malloc(sizeof(Box));
+    *list = board[line][column];
+    int nb_elements = 1, count = 0;
+
+    result[line][column] = count;
+    do{
+
+        count++;
+        int nb_elements_next_list = 4 * nb_elements, cpt = 0;
+        Box* next_list = calloc(nb_elements_next_list, sizeof(Box));
+        
+        for(int i = 0; i < nb_elements; i++)
+        {
+        
+            int nb_neighbours;
+            Box* neighbours = get_neighbours(board, list[i].line, list[i].column, &nb_neighbours);
+        
+            for(int j = 0; j < nb_neighbours; j ++)
+            {
+                if ((result[neighbours[j].line][neighbours[j].column] == -2))
+                {
+                    result[neighbours[j].line][neighbours[j].column] = count;
+                    next_list[cpt++] = neighbours[j];
+                }
+            }
+        }
+        free(list);
+        list = next_list;
+        nb_elements = cpt;
+    }while(nb_elements>0);
+    return result;
+}
+
+Box* get_neighbours(Box** board, int line, int column, int* nb_neighbours)
+{
+    int cpt = 0;
+    Box* neighbours = calloc(4, sizeof(Box));
+    if(line-1 >= 0) neighbours[cpt++] = board[line-1][column];
+    if(line+1 < HEIGHT) neighbours[cpt++] = board[line+1][column];
+    if(column-1 >= 0) neighbours[cpt++] = board[line][column-1];
+    if(column+1 < WIDTH) neighbours[cpt++] = board[line][column+1];
+    *nb_neighbours = cpt;
+    return neighbours;
+}

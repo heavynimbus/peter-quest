@@ -17,3 +17,8 @@ void free_board(Box** board);
 
 int kill(Box** board, int line, int column);
 
+Box** copy_board(Box** board);
+
+int** get_scope_count(Box** board, int line, int column);
+
+Box* get_neighbours(Box** board, int line, int column, int* nb_neighbours);

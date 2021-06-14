@@ -7,8 +7,8 @@ int score_board(Box** board, Player* player, int column, int line) {
     int counthpRed = 0;
     int counthpBlue = 0;
 
-    for (int i=0, i < HEIGHT, i++) {
-        for (int j=0, j < WIDTH, j++) {
+    for (int i=0; i < HEIGHT; i++) {
+        for (int j=0; j < WIDTH; j++) {
 
             switch (board[i][j].hero->type)
             {
@@ -26,7 +26,9 @@ int score_board(Box** board, Player* player, int column, int line) {
             }            
         }
     }
-
+    system("clear");
+    display_debug(get_scope_count(board, line, column));
+    
     if (player->type == HUMAN) {
         score = score + countBlue*1000;
         score = score - countRed*500;

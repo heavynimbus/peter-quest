@@ -258,18 +258,6 @@ void free_game(Game* g){
 }
 
 
-Box* get_neighbours(Box** board, int line, int column, int* nb_neighbours)
-{
-    int cpt = 0;
-    Box* neighbours = calloc(4, sizeof(Box));
-    if(line-1 >= 0) neighbours[cpt++] = board[line-1][column];
-    if(line+1 < HEIGHT) neighbours[cpt++] = board[line+1][column];
-    if(column-1 >= 0) neighbours[cpt++] = board[line][column-1];
-    if(column+1 < WIDTH) neighbours[cpt++] = board[line][column+1];
-    *nb_neighbours = cpt;
-    return neighbours;
-}
-
 int** get_moove_count(Box** board, int line, int column)
 {
     int** result = calloc(HEIGHT, sizeof(int*));
@@ -402,4 +390,29 @@ Player* run(Game* game){
     }while(!is_game_finished);
     free(message);
     return player; // the winner
+}
+
+void test_function() {
+    char* message = calloc(100, sizeof(char));
+    int initial_line = -1, initial_column = -1;
+    int move_line = -1, move_column = -1;
+    Game* game = init_game();
+    set_player(*game, "LEo", HUMAN, 1);
+    // Game* g2 = init_game();
+    select_a_box(game, &initial_line, &initial_column, message);
+    select_a_box(game, &move_line, &move_column, message);
+    move(game->board, initial_line, initial_column, move_line, move_column);
+    display_board(game->board);
+    // display_board(g2->board);
+    // getchar();
+    // g2->board = copy_board(game->board);
+    // system("clear");
+    // printf("board1\n");
+    // display_board(game->board);
+    // printf("board2\n");
+    // display_board(g2->board);
+    
+    int score = score_board(game->board, game->player1, move_column, move_line);
+    printf("%d\n", score);
+    getchar();
 }

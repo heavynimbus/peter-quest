@@ -164,6 +164,7 @@ int main()
 			}
 			break;
 		case 1:
+			test_function();
 			return main();
 		case 2:
 			return 0;
