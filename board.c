@@ -181,3 +181,58 @@ void kill(Box** board, int line, int column)
 	board[line][column].hero = create_hero(NONE_HERO, NONE_RACE);
 	free_hero(to_free);
 }
+
+Box* get_neighbours(Box** board, int line, int column, int* nb_neighbours, int config_height, int config_width)
+{
+    int cpt = 0;
+    Box* neighbours = calloc(4, sizeof(Box));
+    if(line-1 >= 0) neighbours[cpt++] = board[line-1][column];
+    if(line+1 < config_height) neighbours[cpt++] = board[line+1][column];
+    if(column-1 >= 0) neighbours[cpt++] = board[line][column-1];
+    if(column+1 < config_width) neighbours[cpt++] = board[line][column+1];
+    *nb_neighbours = cpt;
+    return neighbours;
+}
+
+int** get_scope_count(Box** board, int line, int column, int config_height, int config_width)
+{
+    int** result = calloc(config_height, sizeof(int*));
+    for(int i = 0; i < config_height; i++)
+    {
+        result[i] = calloc(config_width, sizeof(int));
+        for(int j = 0; j < config_width; j++)
+            result[i][j] = -2;
+    }
+
+
+    Box* list = malloc(sizeof(Box));
+    *list = board[line][column];
+    int nb_elements = 1, count = 0;
+
+    result[line][column] = count;
+    do{
+
+        count++;
+        int nb_elements_next_list = 4 * nb_elements, cpt = 0;
+        Box* next_list = calloc(nb_elements_next_list, sizeof(Box));
+        
+        for(int i = 0; i < nb_elements; i++)
+        {
+        
+            int nb_neighbours;
+            Box* neighbours = get_neighbours(board, list[i].line, list[i].column, &nb_neighbours, config_height, config_width);
+        
+            for(int j = 0; j < nb_neighbours; j ++)
+            {
+                if (result[neighbours[j].line][neighbours[j].column] == -2)
+                {
+                	result[neighbours[j].line][neighbours[j].column] = count;
+                	next_list[cpt++] = neighbours[j];         
+                }
+            }
+        }
+        list = next_list;
+        nb_elements = cpt;
+    }while(nb_elements>0);
+    return result;
+}

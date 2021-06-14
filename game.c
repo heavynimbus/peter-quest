@@ -195,17 +195,6 @@ void select_a_box(Game* game, int height, int width, int* selected_height, int* 
 }
 
 
-Box* get_neighbours(Game* game, int line, int column, int* nb_neighbours)
-{
-    int cpt = 0;
-    Box* neighbours = calloc(4, sizeof(Box));
-    if(line-1 >= 0) neighbours[cpt++] = game->board[line-1][column];
-    if(line+1 < game->config_height) neighbours[cpt++] = game->board[line+1][column];
-    if(column-1 >= 0) neighbours[cpt++] = game->board[line][column-1];
-    if(column+1 < game->config_width) neighbours[cpt++] = game->board[line][column+1];
-    *nb_neighbours = cpt;
-    return neighbours;
-}
 
 
 void display_debug(int** tab, int height, int width)
@@ -244,7 +233,7 @@ int** get_moove_count(Game* game, int line, int column)
         {
         
             int nb_neighbours;
-            Box* neighbours = get_neighbours(game, list[i].line, list[i].column, &nb_neighbours);
+            Box* neighbours = get_neighbours(game->board, list[i].line, list[i].column, &nb_neighbours, game->config_height, game->config_width);
         
             for(int j = 0; j < nb_neighbours; j ++)
             {
@@ -265,54 +254,12 @@ int** get_moove_count(Game* game, int line, int column)
     return result;
 }
 
-int** get_scope_count(Game* game, int line, int column)
-{
-    int** result = calloc(game->config_height, sizeof(int*));
-    for(int i = 0; i < game->config_height; i++)
-    {
-        result[i] = calloc(game->config_width, sizeof(int));
-        for(int j = 0; j < game->config_width; j++)
-            result[i][j] = -2;
-    }
-
-
-    Box* list = malloc(sizeof(Box));
-    *list = game->board[line][column];
-    int nb_elements = 1, count = 0;
-
-    result[line][column] = count;
-    do{
-
-        count++;
-        int nb_elements_next_list = 4 * nb_elements, cpt = 0;
-        Box* next_list = calloc(nb_elements_next_list, sizeof(Box));
-        
-        for(int i = 0; i < nb_elements; i++)
-        {
-        
-            int nb_neighbours;
-            Box* neighbours = get_neighbours(game, list[i].line, list[i].column, &nb_neighbours);
-        
-            for(int j = 0; j < nb_neighbours; j ++)
-            {
-                if (result[neighbours[j].line][neighbours[j].column] == -2)
-                {
-                	result[neighbours[j].line][neighbours[j].column] = count;
-                	next_list[cpt++] = neighbours[j];         
-                }
-            }
-        }
-        list = next_list;
-        nb_elements = cpt;
-    }while(nb_elements>0);
-    return result;
-}
 
 int can_attack(Game* game, int line, int column)
 {
 	if(game->board[line][column].hero->type == NONE_HERO) return FALSE;
 	int scope = game->board[line][column].hero->race->scope;
-	int** scope_count = get_scope_count(game, line, column);
+	int** scope_count = get_scope_count(game->board, line, column, game->config_height, game->config_width);
 	HeroType enemyType = (game->board[line][column].hero->type == BLUE)?RED:BLUE;
 	for(int i = 0; i < game->config_height; i++)
 	{
@@ -341,7 +288,7 @@ void attack_and_response(Game* game, int allyLine, int allyColumn, int enemyLine
 
 	if(enemy->hp > 0)
 	{
-		int** enemy_scope_count = get_scope_count(game, enemyLine, enemyColumn);
+		int** enemy_scope_count = get_scope_count(game->board, enemyLine, enemyColumn, game->config_height, game->config_width);
 		if(enemy_scope_count[allyLine][allyColumn] <= enemy->race->scope)
 		{
 			attack(enemy, ally);
@@ -434,7 +381,7 @@ Player* run(Game* game)
 
 				if(can_attack(game, move_line, move_column))
 				{	
-					int** scope_count = get_scope_count(game, move_line, move_column);
+					int** scope_count = get_scope_count(game->board, move_line, move_column, game->config_height, game->config_width);
 					int attack_line = -1, attack_column = -1;
 					int attack_done = 0;
 					do

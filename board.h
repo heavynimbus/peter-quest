@@ -19,3 +19,7 @@ void display_board(Box** board, int config_height, int config_width);
 void moove(Box** board, int initial_line, int initial_column, int moove_line, int moove_column);
 
 void kill(Box** board, int line, int column);
+
+int** get_scope_count(Box** board, int line, int column, int config_height, int config_width);
+
+Box* get_neighbours(Box** board, int line, int column, int* nb_neighbours, int config_height, int config_width);
