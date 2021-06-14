@@ -14,7 +14,7 @@ config.o: config.c config.h main.h
 game.o: game.c game.h board.h player.h screen.h
 	gcc $(FLAGS) $<
 
-screen.o: screen.c screen.h main.h
+screen.o: screen.c screen.h main.h game.h
 	gcc $(FLAGS) $<
 
 board.o: board.c board.h box.h main.h

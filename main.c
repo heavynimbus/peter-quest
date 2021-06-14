@@ -7,6 +7,12 @@ void between(int* value, int min, int max)
 	if (*value >= max) *value = min;
 }
 
+void display_winner(Player* winner) {
+    system("clear");
+    printf("%s à gagné\n", winner->username);
+    getchar();
+}
+
 int main()
 {
 	setlocale(LC_CTYPE, ""); // for unicode chars
@@ -30,14 +36,24 @@ int main()
 			switch(menu(3, "1 Joueur", "2 Joueurs", "Retour"))
 			{
 				case 0:
-					return main();
+				{
+					Game* game = init_game(config_height, config_width);
+					ask_player_name(game, 0);
+					set_player(game, "IA", IA, 1);
+
+					Player* winner = run(game);
+					display_winner(winner);
+
+					break;
+				}
 				case 1:
 				{
 					Game* game = init_game(config_height, config_width);
 					ask_player_name(game, 0);
 					ask_player_name(game, 1);
 
-					run(game);
+					Player* winner = run(game);
+					display_winner(winner);
 					break;
 				}
 				case 2:

@@ -71,15 +71,15 @@ void display_player_informations(Game* game){
 /**
     Set the player to the game
 */
-void set_player(Game g, char* username, PlayerType type, int id){
+void set_player(Game* g, char* username, PlayerType type, int id){
     switch(id){
         case 0:
-            g.player1->username = username;
-            g.player1->type = type;
+            g->player1->username = username;
+            g->player1->type = type;
             break;
         case 1:
-            g.player2->username = username;
-            g.player2->type = type;
+            g->player2->username = username;
+            g->player2->type = type;
             break;
     }
 }
@@ -94,7 +94,7 @@ void ask_player_name(Game* g, int id){
 	fgets(result, 30, stdin);
 	if(result[strlen(result)-1]=='\n')result[strlen(result)-1]=0;
 	if(strlen(result) == 0) sprintf(result, "Joueur %d", id+1);
-	set_player(*g, result, HUMAN, id);
+	set_player(g, result, HUMAN, id);
 }
 
 

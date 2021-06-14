@@ -12,10 +12,12 @@ typedef struct
 }Game;
 
 //Initialisation partie
-Game* init_game();
+Game* init_game(int config_height, int config_width);
 
 Player* run(Game* game);
 
 void ask_player_name(Game* g, int id);
 
 void display_game(Game* game, int selected_height, int selected_width, char* message);
+
+void set_player(Game* g, char* username, PlayerType type, int id);
