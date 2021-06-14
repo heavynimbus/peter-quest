@@ -33,8 +33,8 @@ int score_board(Box** board, Player* player, int column, int line, int config_he
 
         }
     }
+
     
-    printf("%d%d", column, line);
     if (player->type == HUMAN) {
         score = score + count_blue*NB_ALLY;
         score = score - count_red*NB_ENEMY;
