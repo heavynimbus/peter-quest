@@ -1,108 +1,6 @@
 #include "game.h"
 
 /**
-    Set the heros positions for the beginning of the game
-*/
-void init_heros(Game* game){
-    set_hero(game->board, 1, 'b', create_hero(BLUE, ARCHER));
-    set_hero(game->board, 2, 'b', create_hero(BLUE, SOLDIER));
-    set_hero(game->board, 1, 'd', create_hero(BLUE, ARCHER));
-    set_hero(game->board, 2, 'd', create_hero(BLUE, TRICKSTER));
-    set_hero(game->board, 6, 'b', create_hero(RED, TRICKSTER));
-    set_hero(game->board, 7, 'b', create_hero(RED, ARCHER));
-    set_hero(game->board, 6, 'd', create_hero(RED, SOLDIER));
-    set_hero(game->board, 7, 'd', create_hero(RED, ARCHER));
-}
-
-/**
-    Create a game and initialize it
-*/
-Game* init_game() {
-    Box** board = init_board();
-    Player* player1 = malloc(sizeof(Player));
-    Player* player2 = malloc(sizeof(Player));
-    Game* game = malloc(sizeof(Game));
-    game->board = board;
-    game->player1 = player1;
-    game->player2 = player2;
-    init_heros(game);
-    return game;
-}
-
-/**
-    Swap the two heros from the boxes
-
-    ! warning ! 
-    there is no verification, you have to do it before call this function
-*/
-void move(Box** board, int line1, int column1, int line2, int column2){
-    Hero* save = board[line1][column1].hero;
-    board[line1][column1].hero = board[line2][column2].hero;
-    board[line2][column2].hero = save;
-}
-
-/**
-    The first hero (at line1, column1) attack the second and deals damages
-    reduced by the armor (min 1)
-
-    ! warning ! 
-    there is no verification, you have to do it before call this function  
-*/
-int attack(Box** board, int line1, int column1, int line2, int column2)
-{
-    Hero* hero1 = board[line1][column1].hero;
-    Hero* hero2 = board[line2][column2].hero;
-    int damage = hero1->race->attack;
-    int scope = hero1->race->scope;
-    int len = line1 - line2 + column1 - column2;
-    len = (len < 0)? -len: len;
-    if (len > scope) return -1;
-    hero2->hp = (hero2->race->defense < damage)? hero2->hp - damage + hero2->race->defense: hero2->hp-1;   
-    if(hero2->hp <= 0) kill(board, line2, column2);   
-    return 0;
-}
-
-/**
-    Predicate 
-    return 1 (TRUE) if there is an enemy around him
-    return 0 (FALSE) if not 
-*/
-int can_attack(Box** board, int line, int column)
-{
-    Hero* hero = board[line][column].hero;
-    if(hero->type == NONE_HERO) return FALSE;
-
-    int scope =  hero->race->scope;
-    HeroType ennemy_type = (hero->type == RED)? BLUE: RED;
-    for(int i = 0; i < HEIGHT; i++)
-    {
-        for(int j = 0; j < WIDTH; j++)
-        {
-            int len = line - i + column - j;
-            len = (len < 0)? -len: len;
-            if (len <= scope && board[i][j].hero->type == ennemy_type) return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-/**
-    Set the player to the game
-*/
-void set_player(Game g, char* username, PlayerType type, int id){
-    switch(id){
-        case 1:
-            g.player1->username = username;
-            g.player1->type = type;
-            break;
-        case 2:
-            g.player2->username = username;
-            g.player2->type = type;
-            break;
-    }
-}
-
-/**
     Print the hero informations at x,y index 
 */
 void display_hero_informations(Box box, int x, int y)
@@ -125,8 +23,15 @@ void display_hero_informations(Box box, int x, int y)
     print all the informations about the game
 */
 void display_player_informations(Game* game){
-    int x1 = 15, y1 = 18;
-    int x2 = 100, y2 = 18;
+
+	int screen_height, screen_width;    
+	get_screen_dimensions(&screen_height, &screen_width);
+
+	int x = (screen_width - (4 * game->config_width) )/2;
+	int y = (screen_height - (2 * game->config_height) +2)/2;
+
+    int x1 = x/3, y1 = y;
+    int x2 = x + 4 * game->config_width + x/2, y2 = y;
 
     set_pos(x1, y1);
     printf("%s%s", BLUE_BACKGROUND, game->player1->username);
@@ -136,9 +41,9 @@ void display_player_informations(Game* game){
     printf("%s%s", RED_BACKGROUND, game->player2->username);
     x2 -=5; y2 += 2;
 
-    for(int i = 0; i < HEIGHT; i++)
+    for(int i = 0; i < game->config_height; i++)
     {
-        for(int j = 0; j < WIDTH; j++)
+        for(int j = 0; j < game->config_width; j++)
         {
             switch(game->board[i][j].hero->type)
             {
@@ -164,124 +69,168 @@ void display_player_informations(Game* game){
 }
 
 /**
-    print a message below the game
+    Set the player to the game
 */
-void display_message(char* message)
-{
-    set_pos(1,30);
-    printf("%50s%s", "", message);
+void set_player(Game g, char* username, PlayerType type, int id){
+    switch(id){
+        case 0:
+            g.player1->username = username;
+            g.player1->type = type;
+            break;
+        case 1:
+            g.player2->username = username;
+            g.player2->type = type;
+            break;
+    }
 }
-
 
 /**
-    This method is interactive the the user
-    In height (int*) and width (int*) arguments will be stocked the position selected by the user
+	Ask the player's name
 */
-void select_a_box(Game* game, int* height, int* width, char* message){
-    static struct termios oldMask, newMask;
-    show_logo();
-    tcgetattr ( STDIN_FILENO, &oldMask );
-    newMask = oldMask;
-    newMask.c_lflag &= ~(ICANON); // avoid <enter>
-    newMask.c_lflag &= ~(ECHO); // hide text typed
-    tcsetattr( STDIN_FILENO, TCSANOW, &newMask);
-
-    int column=0, line=0;
-    int choix;
-    do{
-        display_board_underlined(game->board, line, column);
-        display_player_informations(game);
-        if(strlen(message) != 0) display_message(message);
-        switch(choix = getchar()){
-            case 0x41: // up key
-                line--;
-                break;
-            case 0x42: // down key
-                line++;
-                break;
-            case 0x43: // right key
-                column++;
-                break;
-            case 0x44: // left key
-                column--;
-                break;
-        }
-        line = (line < 0)? line + HEIGHT: (line >= HEIGHT)? line - HEIGHT: line;
-        column = (column < 0)? column + WIDTH: (column >= WIDTH)? column - WIDTH: column;
-        column %= WIDTH;
-        set_pos(1, 31);
-        printf("\e[%dA", HEIGHT*2 + 3);
-    }while(choix != '\n');
-
-    *height = line;
-    *width = column;
-    tcsetattr( STDIN_FILENO, TCSANOW, &oldMask);
+void ask_player_name(Game* g, int id){
+	show_logo();
+	char* result = calloc(30, sizeof(char));
+	printf("Joueur %d\nEntrez votre nom:\t", id+1);
+	fgets(result, 30, stdin);
+	if(result[strlen(result)-1]=='\n')result[strlen(result)-1]=0;
+	if(strlen(result) == 0) sprintf(result, "Joueur %d", id+1);
+	set_player(*g, result, HUMAN, id);
 }
 
-/*
-    Check if the game is finished and change who is playing
-*/
+
+void display_game(Game* game, int selected_height, int selected_width, char* message)
+{
+	system("clear");
+	display_board_center(game->board, game->config_height, game->config_width, selected_height, selected_width);
+	display_player_informations(game);
+	if(message != NULL && strlen(message) > 0) display_messages(1, message);
+}
+
+//Initialisation partie
+Game* init_game(int config_height, int config_width)
+{
+	Box** board = init_board(config_height, config_width);
+	init_heros(board, config_height, config_width);
+	Player* player1 = malloc(sizeof(Player));
+	Player* player2 = malloc(sizeof(Player));
+	Game* game = malloc(sizeof(Game));
+	game->board = board;
+	game->player1 = player1;
+	game->player2 = player2; 
+
+	game->config_height = config_height;
+	game->config_width = config_width;
+	return game;
+}
+
+void update_tired(Game* game, HeroType type)
+{
+	for(int i = 0; i < game->config_height; i++)
+        for (int j = 0; j < game->config_width; j++)
+        	if(game->board[i][j].hero->type == type) game->board[i][j].hero->is_tired = 0;
+}
+
 int update_game_state(Game* game, int* who_is_playing, int* is_game_finished){
+    
+	int tired_count1 = 0, tired_count2 = 0;
     int count1=0, count2=0;
-    for(int i = 0; i < HEIGHT; i++)
+    for(int i = 0; i < game->config_height; i++)
     {
-        for (int j = 0; j < WIDTH; j++)
+        for (int j = 0; j < game->config_width; j++)
         {
             switch(game->board[i][j].hero->type)
             {
                 case BLUE:
-                    count1 = (game->board[i][j].hero->hp > 0)? count1+1: count1;
+                    if (game->board[i][j].hero->hp > 0) count1++;
+                    if (game->board[i][j].hero->is_tired) tired_count1++; 
                     break;
                 case RED:
-                    count2 = (game->board[i][j].hero->hp > 0)? count2+1: count2;
+                    if (game->board[i][j].hero->hp > 0) count2++;
+                    if (game->board[i][j].hero->is_tired) tired_count2++;
                     break;
                 case NONE_HERO:
                     continue;
             }
         }
     }
+    if(count1 == tired_count1) update_tired(game, BLUE);
+    if(count2 == tired_count2) update_tired(game, RED);
+
     *is_game_finished = (count1 == 0 || count2 == 0 )? 1:0; 
 
     *who_is_playing = (*who_is_playing)?0:1;
-    return 0;
+    if(*is_game_finished) return (count1)? 0:1;
+    return -1;
 }
 
 
-/**
-    Safe free for a game
-*/
-void free_game(Game* g){
-    free_board(g->board);
-    free_player(g->player1);
-    free_player(g->player2);
-    free(g);
+
+void select_a_box(Game* game, int height, int width, int* selected_height, int* selected_width, char* message, int can_pass)
+{
+    int selected = 0;
+   	do
+   	{
+   		display_game(game, height, width, message);
+   		switch(getchar())
+   		{
+   			case 0x41: height--;// up key
+				break;
+			case 0x42: height++;// down key
+				break;
+			case 0x43: width++;// right key
+				break;
+			case 0x44: width--;// left key
+				break;
+			case '\n': selected++;
+				break;
+			case 'q':
+				if (can_pass) return;
+   		}
+   		between(&height, 0, game->config_height);
+   		between(&width, 0, game->config_width);
+   	}while(!selected);
+   	
+   	*selected_height = height;
+   	*selected_width = width;
 }
 
 
-Box* get_neighbours(Box** board, int line, int column, int* nb_neighbours)
+Box* get_neighbours(Game* game, int line, int column, int* nb_neighbours)
 {
     int cpt = 0;
     Box* neighbours = calloc(4, sizeof(Box));
-    if(line-1 >= 0) neighbours[cpt++] = board[line-1][column];
-    if(line+1 < HEIGHT) neighbours[cpt++] = board[line+1][column];
-    if(column-1 >= 0) neighbours[cpt++] = board[line][column-1];
-    if(column+1 < WIDTH) neighbours[cpt++] = board[line][column+1];
+    if(line-1 >= 0) neighbours[cpt++] = game->board[line-1][column];
+    if(line+1 < game->config_height) neighbours[cpt++] = game->board[line+1][column];
+    if(column-1 >= 0) neighbours[cpt++] = game->board[line][column-1];
+    if(column+1 < game->config_width) neighbours[cpt++] = game->board[line][column+1];
     *nb_neighbours = cpt;
     return neighbours;
 }
 
-int** get_moove_count(Box** board, int line, int column)
+
+void display_debug(int** tab, int height, int width)
 {
-    int** result = calloc(HEIGHT, sizeof(int*));
-    for(int i = 0; i < HEIGHT; i++)
+    for(int i = 0; i < height; i++){
+        printf("[");
+        for(int j = 0; j < width; j++)
+            printf("%d\t", tab[i][j]);
+        printf("]\n");
+    }
+}
+
+int** get_moove_count(Game* game, int line, int column)
+{
+    int** result = calloc(game->config_height, sizeof(int*));
+    for(int i = 0; i < game->config_height; i++)
     {
-        result[i] = calloc(WIDTH, sizeof(int));
-        for(int j = 0; j < WIDTH; j++)
+        result[i] = calloc(game->config_width, sizeof(int));
+        for(int j = 0; j < game->config_width; j++)
             result[i][j] = -2;
     }
 
+
     Box* list = malloc(sizeof(Box));
-    *list = board[line][column];
+    *list = game->board[line][column];
     int nb_elements = 1, count = 0;
 
     result[line][column] = count;
@@ -295,111 +244,236 @@ int** get_moove_count(Box** board, int line, int column)
         {
         
             int nb_neighbours;
-            Box* neighbours = get_neighbours(board, list[i].line, list[i].column, &nb_neighbours);
+            Box* neighbours = get_neighbours(game, list[i].line, list[i].column, &nb_neighbours);
         
             for(int j = 0; j < nb_neighbours; j ++)
             {
-                if ((result[neighbours[j].line][neighbours[j].column] == -2) &&
-                    (board[neighbours[j].line][neighbours[j].column].hero->type == NONE_HERO))
+                if (result[neighbours[j].line][neighbours[j].column] == -2)
                 {
-                    result[neighbours[j].line][neighbours[j].column] = count;
-                    next_list[cpt++] = neighbours[j];
+                    if (game->board[neighbours[j].line][neighbours[j].column].hero->type == NONE_HERO)
+                    {
+                    	result[neighbours[j].line][neighbours[j].column] = count;
+                    	next_list[cpt++] = neighbours[j];
+                    }
+                	else result[neighbours[j].line][neighbours[j].column] = -1;                    
                 }
-                else result[neighbours[j].line][neighbours[j].column] = -1;
             }
         }
-        free(list);
         list = next_list;
         nb_elements = cpt;
     }while(nb_elements>0);
     return result;
 }
 
-Player* run(Game* game){
-    char* message = calloc(100, sizeof(char));
-    char* message_color;
-    int who_is_playing = 0, is_game_finished = 0;
-    Player* player;
+int** get_scope_count(Game* game, int line, int column)
+{
+    int** result = calloc(game->config_height, sizeof(int*));
+    for(int i = 0; i < game->config_height; i++)
+    {
+        result[i] = calloc(game->config_width, sizeof(int));
+        for(int j = 0; j < game->config_width; j++)
+            result[i][j] = -2;
+    }
 
+
+    Box* list = malloc(sizeof(Box));
+    *list = game->board[line][column];
+    int nb_elements = 1, count = 0;
+
+    result[line][column] = count;
     do{
-        if(who_is_playing)
+
+        count++;
+        int nb_elements_next_list = 4 * nb_elements, cpt = 0;
+        Box* next_list = calloc(nb_elements_next_list, sizeof(Box));
+        
+        for(int i = 0; i < nb_elements; i++)
+        {
+        
+            int nb_neighbours;
+            Box* neighbours = get_neighbours(game, list[i].line, list[i].column, &nb_neighbours);
+        
+            for(int j = 0; j < nb_neighbours; j ++)
+            {
+                if (result[neighbours[j].line][neighbours[j].column] == -2)
+                {
+                	result[neighbours[j].line][neighbours[j].column] = count;
+                	next_list[cpt++] = neighbours[j];         
+                }
+            }
+        }
+        list = next_list;
+        nb_elements = cpt;
+    }while(nb_elements>0);
+    return result;
+}
+
+int can_attack(Game* game, int line, int column)
+{
+	if(game->board[line][column].hero->type == NONE_HERO) return FALSE;
+	int scope = game->board[line][column].hero->race->scope;
+	int** scope_count = get_scope_count(game, line, column);
+	HeroType enemyType = (game->board[line][column].hero->type == BLUE)?RED:BLUE;
+	for(int i = 0; i < game->config_height; i++)
+	{
+		for(int j = 0; j < game->config_width; j++)
+		{
+			if ((game->board[i][j].hero->type == enemyType) &&
+							(scope_count[i][j] <= scope))
+			{	
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+
+
+void attack_and_response(Game* game, int allyLine, int allyColumn, int enemyLine, int enemyColumn)
+{
+	Hero* ally = game->board[allyLine][allyColumn].hero;
+	Hero* enemy = game->board[enemyLine][enemyColumn].hero;
+
+	if((ally->type == NONE_HERO) ||
+		(enemy->type == NONE_HERO)) return;
+
+	attack(ally, enemy);
+
+	if(enemy->hp > 0)
+	{
+		int** enemy_scope_count = get_scope_count(game, enemyLine, enemyColumn);
+		if(enemy_scope_count[allyLine][allyColumn] <= enemy->race->scope)
+		{
+			attack(enemy, ally);
+			if(ally->hp <= 0)
+				kill(game->board, allyLine, allyColumn);
+		}
+	}
+	else
+		kill(game->board, enemyLine, enemyColumn);
+}
+
+
+
+Player* run(Game* game)
+{	
+	static struct termios oldMask, newMask;
+	tcgetattr ( STDIN_FILENO, &oldMask );
+    newMask = oldMask;
+    newMask.c_lflag &= ~(ICANON); // avoid <enter>
+    newMask.c_lflag &= ~(ECHO); // hide text typed
+    tcsetattr( STDIN_FILENO, TCSANOW, &newMask);
+	
+	
+	
+	int is_player2_winner;
+	int who_is_playing = 0, is_game_finished = 0;
+	Player* player;
+
+	char* message = calloc(255, sizeof(char));
+	char* message_color;
+
+	do
+	{
+		if(who_is_playing)
         {
             message_color = RED_COLOR;
             player = game->player2;
         }else{
             message_color = BLUE_COLOR;
-                player = game->player1;
+            player = game->player1;
         }
 
-        show_logo();
-        display_board(game->board);
-        sprintf(message, "%s%s préparez vous !", message_color, (who_is_playing)?game->player2->username: game->player1->username);
-        display_message(message);
-        getchar();
-        
-        // TODO
-        // demander son deplacement
-        int initial_line = -1, initial_column = -1;
-        int move_line = -1, move_column = -1;
-        int attack_line = -1, attack_column = -1;
-        int attack_res = -2, move_done = 0;
-        do{
-            
-            do{ 
-                sprintf(message, "%sVous devez choisir une de vos unités", message_color);
-                select_a_box(game, &initial_line, &initial_column, message);
-            }while(game->board[initial_line][initial_column].hero->type != ((who_is_playing)?RED:BLUE));
-
-            int** moove_count = get_moove_count(game->board, initial_line, initial_column); 
-
-            do{
-                sprintf(message, "%sVous devez choisir un deplacement", message_color);
-                select_a_box(game, &move_line, &move_column, message);
-            }while(game->board[move_line][move_column].hero->type != NONE_HERO);
-            move(game->board, initial_line, initial_column, move_line, move_column);
-            move_done = 1;
-            if(moove_count[move_line][move_column] <= game->board[initial_line][initial_column].hero->race->shifting)
-            {       
-                set_pos(1,1);
-                printf("Ouais");
-            }else{
-                show_logo();
-                display_board(game->board);
-                sprintf(message, "%sDeplacement maximal dépassé :/", message_color);
-                display_message(message);
-                getchar();
-            }
-
-        }while(!move_done);
-        // deplacer l'unite
-        // si l'unite peut attaquer, attaquer
-
-        //attaque
-        if(can_attack(game->board, move_line, move_column))
-        do
+        switch(player->type)
         {
-            if(attack_res > -2)
-            {
-                show_logo();
-                display_board(game->board);
-                sprintf(message, "%sL'unité ennemi est trop loin, choisissez une autre unité", message_color);
-                display_message(message);
-                getchar();
-            }
-            
-            do{ 
-                sprintf(message, "%sVous devez choisir une unité ennemie", message_color);
-                select_a_box(game, &attack_line, &attack_column, message);
-            }while(game->board[attack_line][attack_column].hero->type != ((who_is_playing)?BLUE:RED)); 
+        	case HUMAN:
+        	{
+        		sprintf(message, "%s%s préparez vous !", message_color, player->username);
+				display_game(game, -1, -1, message);
+				getchar();
+		        
 
-            // recuperer les deplacements possible pour cette unité
-            // int attack(Box** board, int x1, int y1, int x2, int y2)
-            attack_res = attack(game->board, move_line, move_column, attack_line, attack_column);
-            if(game->board[attack_line][attack_column].hero->hp > 0) attack(game->board, attack_line, attack_column, move_line, move_column);
-        }while(attack_res < 0);
+		        int initial_line = -1, initial_column = -1;
+		        int move_line = -1, move_column = -1;
+				int move_done = 0;
+				do
+				{
+					do
+					{
+						sprintf(message, "%sSelectionnez une de vos unités pour un deplacement",message_color);
+						select_a_box(game, 0, 0, &initial_line, &initial_column, message, 0);
+					}while(game->board[initial_line][initial_column].hero->type != ((who_is_playing)?RED:BLUE));
 
-        update_game_state(game, &who_is_playing, &is_game_finished);
-    }while(!is_game_finished);
-    free(message);
-    return player; // the winner
+					if (game->board[initial_line][initial_column].hero->is_tired)
+					{
+						sprintf(message, "%sCette unité est trop fatiguée..", message_color);
+						display_game(game, -1, -1, message);
+						getchar();
+						continue;
+					}
+
+					int** moove_count = get_moove_count(game, initial_line, initial_column);
+					do
+					{
+						sprintf(message, "%sChoisissez votre deplacement",message_color);
+						select_a_box(game, initial_line, initial_column, &move_line, &move_column, message, 0);
+					}while(game->board[move_line][move_column].hero->type != NONE_HERO);
+
+					if(moove_count[move_line][move_column] <= game->board[initial_line][initial_column].hero->race->shifting)
+					{
+						moove(game->board, initial_line, initial_column, move_line, move_column);
+						move_done++;
+					}
+					else
+					{
+						sprintf(message, "%sCette unité ne peut pas de deplacer de plus de %d cases ...", message_color, game->board[initial_line][initial_column].hero->race->shifting);
+						display_game(game, -1, -1, message);
+						getchar();
+					}
+				}while(!move_done);
+
+				if(can_attack(game, move_line, move_column))
+				{	
+					int** scope_count = get_scope_count(game, move_line, move_column);
+					int attack_line = -1, attack_column = -1;
+					int attack_done = 0;
+					do
+					{
+						do
+						{
+							sprintf(message, "%sChoisissez l'unité que vous voulez attaquer. Appuyez sur 'q' pour passer", message_color);
+							select_a_box(game, move_line, move_column, &attack_line, &attack_column, message, 1);
+							if(attack_line < 0 && attack_column < 0) break;
+						}while(game->board[attack_line][attack_column].hero->type != ((who_is_playing)?BLUE:RED));
+
+						if(attack_line < 0 && attack_column < 0) break;
+						if (scope_count[attack_line][attack_column] <= game->board[move_line][move_column].hero->race->scope)
+						{
+							attack_and_response(game, move_line, move_column, attack_line, attack_column);
+							attack_done++;
+						}
+						else 
+						{
+							sprintf(message, "%sVotre unité a une portée d'attaque de %d cases", message_color, game->board[initial_line][initial_column].hero->race->shifting);
+							display_game(game, -1, -1, message);
+							getchar();
+						}
+					}while(!attack_done);
+				}
+				game->board[move_line][move_column].hero->is_tired = 1;
+        		break;
+        	}
+        	case IA:
+        	{
+        		break;
+        	}
+        }
+        is_player2_winner = update_game_state(game, &who_is_playing, &is_game_finished);
+	}while(!is_game_finished);
+
+
+    tcsetattr( STDIN_FILENO, TCSANOW, &oldMask);
+
+	if(is_player2_winner) return game->player2;
+	return game->player1;
 }

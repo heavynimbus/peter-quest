@@ -5,6 +5,7 @@ Hero* create_hero(HeroType type, RaceType race){
 	result->type = type;
 	result->race = create_race(race);
 	result->hp = result->race->max_hp;
+	result->is_tired = 0;
 	return result;
 }
 
@@ -45,4 +46,11 @@ void display_hero(Hero* hero){
 void free_hero(Hero* hero){
 	free(hero->race);
 	free(hero);
+}
+
+void attack(Hero* ally, Hero* enemy)
+{
+	int damages = ally->race->attack - enemy->race->defense;
+	if(damages <= 0) damages = 1;
+	enemy->hp -= damages;
 }

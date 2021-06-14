@@ -1,102 +1,183 @@
 #include "board.h"
 #include "screen.h"
-
-
-void  set_hero(Box** board, int column, char line, Hero* hero)
-{
-  	board[(int)(line-'a')][column-1].hero = hero;
+// create and initialize a board
+Box** init_board(int config_height, int config_width){
+	Box** board = calloc(config_height, sizeof(Box*));
+	for(int i = 0; i < config_height; i++) {
+		board[i] = calloc(config_width, sizeof(Box));
+		for(int j = 0; j < config_width; j++)
+			board[i][j] = create_box(i, j, create_hero(NONE_HERO, NONE_RACE));
+	}
+	return board;
 }
 
-Box** init_board()
-{
-	Box** result = (Box**) calloc(HEIGHT, sizeof(Box*));
-	for(int i = 0; i < HEIGHT; i++)
-	{
-		Box* line = (Box*) calloc(WIDTH, sizeof(Box));
-		for(int j = 0; j < WIDTH; j++)
-		{
-			line[j] = create_box(i, j, create_hero(NONE_HERO, NONE_RACE));
-		}
-		result[i] = line;
-	}
-	
 
+void get_const_lines(char* number_line, char* top_line, char* filling_line, char* bottom_line, int width)
+{
+	strcat(number_line, WHITE_COLOR);
+	char* tmp = calloc(30, sizeof(char));
+	for (int j = 0; j < width; j++)
+	{
+		sprintf(tmp, "%lc%lc%lc%lc", (j == 0)? TOP_LEFT_CORNER : TOP_MIDDLE,
+									 DOUBLE_HORIZONTAL,
+									 DOUBLE_HORIZONTAL, 
+									 DOUBLE_HORIZONTAL);
+		strcat(top_line, tmp);
+		sprintf(tmp, "%lc%lc%lc%lc", (j == 0)? BOTTOM_LEFT_CORNER : BOTTOM_MIDDLE,
+									 DOUBLE_HORIZONTAL,
+									 DOUBLE_HORIZONTAL, 
+									 DOUBLE_HORIZONTAL);
+		strcat(bottom_line, tmp);
+		sprintf(tmp, "%lc%lc%lc%lc", (j == 0)? FILLING_LEFT : FILLING_MIDDLE,
+									 SIMPLE_HORIZONTAL,
+									 SIMPLE_HORIZONTAL, 
+									 SIMPLE_HORIZONTAL);
+		strcat(filling_line, tmp);
+		sprintf(tmp, " %2d ", j+1);
+		strcat(number_line, tmp);
+	}
+	sprintf(tmp, "%lc", TOP_RIGHT_CORNER);
+	strcat(top_line, tmp);
+	sprintf(tmp, "%lc", BOTTOM_RIGHT_CORNER);
+	strcat(bottom_line, tmp);
+	sprintf(tmp, "%lc", FILLING_RIGHT);
+	strcat(filling_line, tmp);
+}
+
+char* get_variable_line(Box* line, int width, int selected)
+{
+ 	char* result = calloc(255, sizeof(char));
+ 	char* tmp = calloc(255, sizeof(char));
+ 	char* color;
+ 	for(int i = 0; i < width; i++)
+ 	{
+ 		Box box = line[i];
+ 		switch(box.hero->type)
+ 		{
+ 			case BLUE: color = BLUE_COLOR;
+ 				break;
+ 			case RED: color = RED_COLOR;
+ 				break;
+ 			case NONE_HERO: color = WHITE_COLOR;
+ 				break;
+ 		}
+ 		if(i == selected) color = UNDERLINE;
+
+		sprintf(tmp, "%lc %s%c%s ", (i==0)?DOUBLE_VERTICAL:SIMPLE_VERTICAL,
+								color,
+								get_char(box.hero->race->type),
+								WHITE_COLOR);
+		strcat(result, tmp);
+ 	}
+ 	sprintf(tmp, "%lc", DOUBLE_VERTICAL);
+ 	strcat(result, tmp);
 	return result;
 }
 
-char* get_value_with_color(Hero* hero)
-{	
-	char* result = calloc(255, sizeof(char));
-	switch(hero->type){
-		case BLUE: sprintf(result, "%s%c%s", BLUE_COLOR, get_char(hero->race->type), WHITE_COLOR);
-			break;
-		case RED: sprintf(result, "%s%c%s", RED_COLOR, get_char(hero->race->type), WHITE_COLOR);
-			break;
-		case NONE_HERO: sprintf(result, "%s%c%s", WHITE_COLOR, get_char(hero->race->type), WHITE_COLOR);
-			break;
-	}
-	return result;
-}
-
-void display_board(Box** board)
+char** board_to_string(Box** board,int config_height, int config_width, int selected_height, int selected_width, int* size)
 {
-	const char* numbers_line = "\t 1 2 3 4 5 6 7";
-	const char* filling_line = "\t|-------------|";
+	char* top_line = calloc(255, sizeof(char));
+	char* bottom_line = calloc(255, sizeof(char));
+	char* filling_line = calloc(255, sizeof(char));
+	char* number_line = calloc(255, sizeof(char));
+ 	get_const_lines(number_line, top_line, filling_line, bottom_line, config_width);
 
-	printf("%s%48s%s\n%48s%s\n", WHITE_COLOR, "", numbers_line,"", filling_line);
+ 	int cpt = 0;
+ 	char* variable_lines[config_height];
+ 	for(int i = 0; i < config_height; i++)
+ 	{
+ 		if(i == selected_height) variable_lines[i] = get_variable_line(board[i], config_width, selected_width);
+ 		else variable_lines[i] = get_variable_line(board[i], config_width, -1);
+
+ 	}
 
 
-	for(int i = 0; i < HEIGHT; i++){
-		
-		char* line_to_print = (char*)calloc(16, sizeof(char));
-		char** values = calloc(WIDTH, sizeof(char*)); // init all values to 0
-		for(int j = 0; j < WIDTH; j++)
-		{
-			values[j] = get_value_with_color(board[i][j].hero);
-		}
-		sprintf(line_to_print, "%c\t|%s|%s|%s|%s|%s|%s|%s|", (char)('a'+ i) ,values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
-		printf("%48s%s\n%48s%s\n", "", line_to_print, "", filling_line);
-	}
+ 	*size = (config_height * 2)+2;
+ 	char** result = calloc(*size, sizeof(char*));
+ 	for(int i = 0; i < *size; i++)
+ 	{
+ 		if(i == 0) result[i] = number_line;
+ 		else if(i == 1) result[i] = top_line;
+ 		else if((i % 2) == 1)
+ 		{
+ 			if(i == (*size - 1)) result[i] = bottom_line;
+ 			else result[i] = filling_line;	
+ 		} 
+ 		else
+ 		{
+ 			result[i] = variable_lines[cpt++];
+ 		}
+ 	}
+ 	return result;
 }
 
-void display_board_underlined(Box** board, int line, int column)
+void init_heros(Box** board, int height, int width)
 {
-	const char* numbers_line = "\t 1 2 3 4 5 6 7";
-	const char* filling_line = "\t|-------------|";
-
-	printf("%s%48s%s\n%48s%s\n", WHITE_COLOR, "", numbers_line,"", filling_line);
-
-	for(int i = 0; i < HEIGHT; i++){
-		
-		char* line_to_print = (char*)calloc(16, sizeof(char));
-		char** values = calloc(WIDTH, sizeof(char*)); // init all values to 0
-		for(int j = 0; j < WIDTH; j++)
-		{	
-			values[j] = calloc(255, sizeof(char));
-			if (i == line && j == column){
-				sprintf(values[j], "%s%c%s", UNDERLINE, get_char(board[i][j].hero->race->type), WHITE_COLOR);
-			}else{
-				values[j] = get_value_with_color(board[i][j].hero);
-			}
-		}
-		sprintf(line_to_print, "%c\t|%s|%s|%s|%s|%s|%s|%s|", (char)('a'+ i) ,values[0], values[1], values[2], values[3], values[4], values[5], values[6]);
-		printf("%48s%s\n%48s%s\n", "", line_to_print, "", filling_line);
-	}
-}
-
-void free_board(Box** board){
-	for(int i = 0; i < HEIGHT; i++)
+	int middle = height/2;
+	printf("height:%d, width:%d -> middle %d\n",height, width, middle );
+	switch(height%2)
 	{
-		for (int j = 0; j < WIDTH; j++)
-		{
-			free_box(board[i][j]);
-		}
+		case 0:
+			board[middle+1][0].hero = create_hero(BLUE, ARCHER);
+			board[middle+1][width-1].hero = create_hero(RED, TRICKSTER);
+
+			board[middle+1][1].hero = create_hero(BLUE, SOLDIER);
+			board[middle+1][width-2].hero = create_hero(RED, SOLDIER);
+
+			board[middle-2][0].hero = create_hero(BLUE, TRICKSTER);
+			board[middle-2][width-1].hero = create_hero(RED, ARCHER);
+
+			board[middle-2][1].hero = create_hero(BLUE, SOLDIER);
+			board[middle-2][width-2].hero = create_hero(RED, SOLDIER);
+			break;
+		case 1:
+			board[middle+1][0].hero = create_hero(BLUE, ARCHER);
+			board[middle+1][width-1].hero = create_hero(RED, TRICKSTER);
+
+			board[middle+1][1].hero = create_hero(BLUE, SOLDIER);
+			board[middle+1][width-2].hero = create_hero(RED, SOLDIER);
+
+			board[middle-1][0].hero = create_hero(BLUE, TRICKSTER);
+			board[middle-1][width-1].hero = create_hero(RED, ARCHER);
+
+			board[middle-1][1].hero = create_hero(BLUE, SOLDIER);
+			board[middle-1][width-2].hero = create_hero(RED, SOLDIER);
+			break;
 	}
 }
 
-int kill(Box** board, int line, int column)
+void display_board_center(Box** board, int config_height, int config_width, int selected_height, int selected_width)
 {
-	if(board[line][column].hero->type == NONE_HERO) return 0;
+	int size;
+	char** to_display = board_to_string(board, config_height, config_width, selected_height, selected_width, &size);
+	int screen_height, screen_width, cpt = 0;
+	get_screen_dimensions(&screen_height, &screen_width);
+	int x = (screen_width - (4 * config_width) )/2;
+	int y = (screen_height - (2 * config_height) +2)/2;
+ 	for(int j = 0; j < size; j++)
+ 	{
+ 		set_pos(x,y++);
+ 		printf("%c\t%s\n",(j%2 != 1 && j > 1)?'A'+cpt++:' ', to_display[j]);
+	}	
+}
+
+void display_board(Box** board, int config_height, int config_width)
+{
+	int size = 0;
+	char** to_display = board_to_string(board, config_height, config_width, -1, -1, &size);
+	for(int i = 0; i < size; i++) printf("%s\n", to_display[i]);
+}
+
+void moove(Box** board, int initial_line, int initial_column, int moove_line, int moove_column)
+{
+	Hero* tmp = board[initial_line][initial_column].hero;
+	board[initial_line][initial_column].hero = board[moove_line][moove_column].hero;
+	board[moove_line][moove_column].hero = tmp;
+}
+
+void kill(Box** board, int line, int column)
+{
+	Hero* to_free = board[line][column].hero;
 	board[line][column].hero = create_hero(NONE_HERO, NONE_RACE);
-	return 1;
+	free_hero(to_free);
 }
