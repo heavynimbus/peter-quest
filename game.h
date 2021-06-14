@@ -17,5 +17,3 @@ void set_player(Game g, char* username, PlayerType type, int id);
 void free_game(Game* g);
 
 Player* run(Game* game);
-
-void test_function();

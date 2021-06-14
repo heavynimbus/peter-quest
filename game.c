@@ -391,28 +391,3 @@ Player* run(Game* game){
     free(message);
     return player; // the winner
 }
-
-void test_function() {
-    char* message = calloc(100, sizeof(char));
-    int initial_line = -1, initial_column = -1;
-    int move_line = -1, move_column = -1;
-    Game* game = init_game();
-    set_player(*game, "LEo", HUMAN, 1);
-    // Game* g2 = init_game();
-    select_a_box(game, &initial_line, &initial_column, message);
-    select_a_box(game, &move_line, &move_column, message);
-    move(game->board, initial_line, initial_column, move_line, move_column);
-    display_board(game->board);
-    // display_board(g2->board);
-    // getchar();
-    // g2->board = copy_board(game->board);
-    // system("clear");
-    // printf("board1\n");
-    // display_board(game->board);
-    // printf("board2\n");
-    // display_board(g2->board);
-    
-    int score = score_board(game->board, game->player1, move_column, move_line);
-    printf("%d\n", score);
-    getchar();
-}
