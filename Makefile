@@ -2,7 +2,7 @@ FLAGS = -c -Wall -Werror -Wextra
 
 .PHONY: clean real-clean
 
-peter-quest: main.o config.o screen.o hero.o race.o box.o board.o player.o game.o
+peter-quest: main.o config.o screen.o hero.o race.o box.o board.o player.o game.o ia.o
 	gcc -o $@ $^
 
 main.o: main.c main.h config.h screen.h board.h
@@ -31,7 +31,11 @@ race.o: race.c race.h main.h
 
 player.o: player.c player.h main.h
 	gcc $(FLAGS) $<
+	
+ia.o: ia.c ia.h game.h
+	gcc $(FLAGS) $<
 
+>>>>>>> e27a663 (feat: add ia files and score function)
 clean:
 	rm -f *.o
 

@@ -39,10 +39,11 @@ void set_config(char* config_file_path, int height, int width)
 		exit(EXIT_FAILURE);
 	}
 	
-	sprintf(message, "WIDTH:%d\n", width);
-	fprintf(config_file, message);
-	sprintf(message, "HEIGHT:%d\n", height);
-	fprintf(config_file, message);
+	   
+    sprintf(message, "WIDTH:%d\n", width);
+    fputs(message, config_file);
+    sprintf(message, "HEIGHT:%d\n", height);
+    fputs(message, config_file);
 
 	fclose(config_file);
 }
