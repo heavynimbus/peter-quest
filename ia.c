@@ -31,10 +31,6 @@ int score_board(Box** board, Player* player, int column, int line) {
             }
 
         }
-        // printf("\n\n\n");
-        // display_debug(get_scope_count(board, line, column));
-        // printf("\n%d\n%d", count_shifting_b, count_shifting_r);
-        // getchar();
     }
 
     
