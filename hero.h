@@ -21,3 +21,5 @@ void display_hero(Hero* hero);
 void free_hero(Hero* hero);
 
 void attack(Hero* ally, Hero* enemy);
+
+Hero* copy_hero(Hero* hero);

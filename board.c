@@ -236,3 +236,15 @@ int** get_scope_count(Box** board, int line, int column, int config_height, int 
     }while(nb_elements>0);
     return result;
 }
+
+Box** copy_board(Box** board,int config_height, int config_width) {
+	
+	Box** copy = calloc(config_height, sizeof(Box*));
+	for(int i=0; i<config_height; i++) {
+		copy[i] = calloc(config_width, sizeof(Box));
+		for(int j=0; j<config_width; j++) {
+			copy[i][j] = copy_box(board[i][j]);
+		}
+	}
+	return copy;
+}

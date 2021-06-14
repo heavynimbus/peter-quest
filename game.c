@@ -276,6 +276,63 @@ int can_attack(Game* game, int line, int column)
 }
 
 
+int score_board(Game* game, Player* player, int line, int column) {
+    int score = 0;
+    int count_red = 0;
+    int count_blue = 0;
+    int count_hp_r = 0;
+    int count_hp_b = 0;
+    int count_shifting_b = 0;
+    int count_shifting_r = 0;
+
+    int** scope_count = get_scope_count(game->board, line, column, game->config_height, game->config_width);
+
+
+    for (int i=0; i < game->config_height; i++) {
+        for (int j=0; j < game->config_width; j++) {
+            switch (game->board[i][j].hero->type)
+            {
+                case RED:
+                    count_red++;
+                    count_hp_r = count_hp_r + game->board[i][j].hero->hp;
+                    count_shifting_r = count_shifting_r + scope_count[i][j];
+                    break;
+                
+                case BLUE:
+                    count_blue++;
+                    count_hp_b = count_hp_b + game->board[i][j].hero->hp;
+                    count_shifting_b = count_shifting_b + scope_count[i][j];
+                    break;
+                default:
+                    break;
+            }
+
+        }
+    }
+
+
+    if (player->type == HUMAN) {
+        score = score + count_blue*NB_ALLY;
+        score = score - count_red*NB_ENEMY;
+        score = score + count_hp_b*HP_ALLY;
+        score = score - count_hp_r*HP_ENEMY;
+        score = score + count_shifting_b*PROXIMITY_ALLY;
+        score = score - count_shifting_r*PROXIMITY_ENEMY;
+    } else {
+        score = score - count_blue*NB_ENEMY;
+        score = score + count_red*NB_ALLY;
+        score = score + count_hp_r*HP_ALLY;
+        score = score - count_hp_b*HP_ENEMY;
+        score = score + count_shifting_r*PROXIMITY_ALLY;
+        score = score - count_shifting_b*PROXIMITY_ENEMY;
+    }
+
+    printf("\n%d : %d\n", count_shifting_b, count_shifting_r);
+    getchar();
+
+    return score;
+}
+
 void attack_and_response(Game* game, int allyLine, int allyColumn, int enemyLine, int enemyColumn)
 {
 	Hero* ally = game->board[allyLine][allyColumn].hero;
@@ -300,7 +357,67 @@ void attack_and_response(Game* game, int allyLine, int allyColumn, int enemyLine
 		kill(game->board, enemyLine, enemyColumn);
 }
 
+Node* create_node(Game* game) {
+    Node* node = malloc(sizeof(Node));
+    node->game = game;
+    node->children = calloc(game->config_height*game->config_width, sizeof(Node));
+    node->score = -1;
+    node->nb_children = 0;
+    return node;
+}
 
+Position* get_heroes_position(Game* game, HeroType type, int* nb_position) {
+    Position* result = calloc(4, sizeof(Position));
+    int count = 0;
+
+    for(int i=0; i<game->config_height; i++) {
+        for(int j=0; j<game->config_width; j++){            
+            if (game->board[i][j].hero->type == type && !game->board[i][j].hero->is_tired) {
+                result[count].line = i;
+                result[count].column = j;
+                count++;
+            }
+        }
+    }
+
+    *nb_position = count;
+
+    return result;
+}
+
+Game* copy_game(Game* game) {
+    Game* copy = malloc(sizeof(Game));
+    copy->board = copy_board(game->board);
+    copy->config_height = game->config_height;
+    copy->config_width = game->config_width;
+    copy->player1 = game->player1;
+    copy->player2 = game->player2;
+    return copy;
+}
+
+Position* get_posible_moved(Game* game, int line, int column, int nb_position) {
+    int** moove_count = get_moove_count(game, int line, int column);
+    int shifting = game->board[line][column].hero->race->shifting;
+    int count = 0;
+    Position* result = calloc(game->config_height*game->config_width, sizeof(Position));
+    for (int i=0; i<game->config_height; i++) {
+        for(int j=0; j<game->config_width; j++) {
+            if(moove_count[i][j]<=shifting && moove_count[i][j] >=0) {
+                result[count].line = i;
+                result[count].column = j;
+                count++;
+            }
+        }
+    }
+
+    *nb_position = count;
+    return result;
+    
+}
+
+void add_node(Node* first, Node* second) {
+    
+}
 
 Player* run(Game* game)
 {	
@@ -412,6 +529,27 @@ Player* run(Game* game)
         	}
         	case IA:
         	{
+                int nb_position;
+                int nb_possible_move;
+                int score;
+
+                system("clear");
+                Position* heroes = get_heroes_position(game, (who_is_playing)? RED : BLUE, &nb_position);
+                Node* first_node = create_node(game);
+                Game* copy;
+                for(int i=0; i<nb_position; i++) {
+                    printf("%d\t%d\n", heroes[i].line, heroes[i].column);
+                    Position* possible_move = get_posible_moved(game, heroes[i].line, heroes[i].column, &nb_possible_move);
+                    for(int j=0; j<nb_possible_move; j++) {
+                        copy = copy_game(game);
+                        moove(copy->board, heroes[i].line, heroes[i].column, possible_move[j].line, possible_move[j].column);
+                        score = score_board(copy, player, possible_move[j].line, possible_move[j].column);
+                    }
+                }
+            
+                display_board(game->board, game->config_height, game->config_width);
+                getchar();
+
         		break;
         	}
         }

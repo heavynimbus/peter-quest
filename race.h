@@ -17,3 +17,5 @@ typedef struct {
 Race* create_race(RaceType type);
 
 char get_char(RaceType type);
+
+Race* copy_race(Race* race);

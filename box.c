@@ -22,3 +22,7 @@ char* get_hero_informations(Box box) {
 	sprintf(result, "%lc%c(%c,%d): %ls %d%lc %d%lc %d%lc",(box.hero->is_tired)?SLEEP:' ', get_char(box.hero->race->type), box.line + 'a', box.column + 1, health, box.hero->race->attack, SWORD, box.hero->race->defense, SHIELD, box.hero->race->shifting, FOOT);
 	return result;
 }
+
+Box copy_box(Box box) {
+	return create_box(box.line, box.column, copy_hero(box.hero));
+}

@@ -43,3 +43,14 @@ char get_char(RaceType type){
 			return ' ';
 	}
 }
+
+Race* copy_race(Race* race) {
+	Race* copy = malloc(sizeof(Race));
+	copy->attack = race->attack;
+	copy->defense = race->defense;
+	copy->max_hp = race->max_hp;
+	copy->scope = race->scope;
+	copy->shifting = race->shifting;
+	copy->type = race->type;
+	return copy;
+}

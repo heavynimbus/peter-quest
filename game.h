@@ -1,6 +1,7 @@
 #include "main.h"
 #include "screen.h"
-#include "ia.h"
+#include "board.h"
+#include "player.h"
 
 typedef struct
 {
@@ -10,6 +11,23 @@ typedef struct
     int config_height;
     int config_width;
 }Game;
+
+struct node
+{
+    Game* game;
+    struct node* children;
+    int score;
+    int nb_children;
+};
+
+typedef struct node Node;
+
+typedef struct
+{
+    int line;
+    int column;
+}Position;
+
 
 //Initialisation partie
 Game* init_game(int config_height, int config_width);

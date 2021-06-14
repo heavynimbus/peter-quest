@@ -1,5 +1,5 @@
 #include "config.h"
-#include "game.h"
+#include "ia.h"
 
 void between(int* value, int min, int max)
 {

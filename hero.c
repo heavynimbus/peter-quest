@@ -54,3 +54,12 @@ void attack(Hero* ally, Hero* enemy)
 	if(damages <= 0) damages = 1;
 	enemy->hp -= damages;
 }
+
+Hero* copy_hero(Hero* hero) {
+	Hero* copy = malloc(sizeof(Hero));
+	copy->hp = hero->hp;
+	copy->is_tired = hero->is_tired;
+	copy->race = copy_race(hero->race);
+	copy->type = hero->type;
+	return copy;
+}
