@@ -32,10 +32,9 @@ race.o: race.c race.h main.h
 player.o: player.c player.h main.h
 	gcc $(FLAGS) $<
 	
-ia.o: ia.c ia.h game.h
+ia.o: ia.c ia.h main.h board.h player.h
 	gcc $(FLAGS) $<
 
->>>>>>> e27a663 (feat: add ia files and score function)
 clean:
 	rm -f *.o
 

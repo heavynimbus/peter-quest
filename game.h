@@ -1,7 +1,6 @@
 #include "main.h"
-#include "board.h"
-#include "player.h"
 #include "screen.h"
+#include "ia.h"
 
 typedef struct
 {

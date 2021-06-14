@@ -1,14 +1,14 @@
 #include "ia.h"
 
-int score_board(Box** board, Player* player, int column, int line) {
+int score_board(Box** board, Player* player, int column, int line, int config_height, int config_width) {
     int score = 0;
     int countRed = 0;
     int countBlue = 0;
     int counthpRed = 0;
     int counthpBlue = 0;
 
-    for (int i=0; i < HEIGHT; i++) {
-        for (int j=0; j < WIDTH; j++) {
+    for (int i=0; i < config_height; i++) {
+        for (int j=0; j < config_width; j++) {
 
             switch (board[i][j].hero->type)
             {
@@ -26,7 +26,8 @@ int score_board(Box** board, Player* player, int column, int line) {
             }            
         }
     }
-
+    
+    printf("%d%d", column, line);
     if (player->type == HUMAN) {
         score = score + countBlue*1000;
         score = score - countRed*500;
