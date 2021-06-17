@@ -42,7 +42,8 @@ Node* create_node(NodeValue* value)
 void display_node(Node* node, int tab)
 {
 	for(int i = 0; i < tab; i++)printf("\t");
-	display_node_value(node->value);
+	if(node->value != NULL)display_node_value(node->value);
+	else printf("-- FIRST NODE (no value) --\n");
 	for(int i = 0; i < node->nb_arg; i++)
 		display_node(node->node_list+i, tab+1);
 }

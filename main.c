@@ -55,8 +55,6 @@ int main()
 			}
 			break;
 		case 1:
-			show_about();
-			getchar();
 			return main();
 		case 2:
 			option_menu(&config_height, &config_width);

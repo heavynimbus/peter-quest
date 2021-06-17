@@ -425,6 +425,59 @@ Position* get_posible_attack(Game* game, int line, int column, int* nb_position)
     
 }
 
+void develop_node(Node* first, Game* game, int who_is_playing)
+{
+    int nb_position;
+    Position* heroes = get_heroes_position(game, (who_is_playing)? RED : BLUE, &nb_position);
+    
+    Position* initial;
+    Position* move;
+    Position* attack;
+    
+    Game* copy;
+    Game* copy_attack;
+    
+    for(int i=0; i<nb_position; i++) {
+        printf("========================== HERO (%d, %d) ==========================\n", heroes[i].line, heroes[i].column);
+        initial = malloc(sizeof(Position));
+        *initial = heroes[i];
+        int nb_possible_moves;
+        Position* possible_moves = get_posible_moves(game, initial->line, initial->column, &nb_possible_moves);
+
+        for(int j = 0; j < nb_possible_moves; j++)
+        {
+            copy = copy_game(game);
+            printf("------------------------- deplacement (%d, %d) -------------------------\n", possible_moves[j].line, possible_moves[j].column);
+            moove(copy->board, initial->line, initial->column, possible_moves[j].line, possible_moves[j].column);
+            printf("reel:\n");
+            display_board(game->board, game->config_height, game->config_width);
+            printf("deplacement:\n");
+            display_board(copy->board, copy->config_height, copy->config_width);
+            move = malloc(sizeof(Position));
+            *move = possible_moves[j];
+            int nb_possible_attack;
+            Position* possible_attacks = get_posible_attack(copy, move->line, move->column, &nb_possible_attack);
+
+            for(int k = 0; k < nb_possible_attack; k++)
+            {
+                copy_attack = copy_game(copy);
+                printf("debug:\n");
+                if(possible_attacks[k].line >= 0 && possible_attacks[k].column >= 0)
+                    attack_and_response(copy_attack, possible_moves[j].line, possible_moves[j].column, possible_attacks[k].line, possible_attacks[k].column);                                
+                int score = score_board(copy_attack, (who_is_playing)?copy_attack->player2:copy_attack->player1, possible_moves[j].line, possible_moves[j].column);
+                display_board(copy_attack->board, copy_attack->config_height, copy_attack->config_width);
+                printf(">>>>>>>>> attaque possible (%d, %d) <<<<<<<<\n", possible_attacks[k].line, possible_attacks[k].column);
+                attack = malloc(sizeof(Position));
+                *attack = possible_attacks[k];
+                NodeValue* value = create_node_value(score, initial, move, attack);
+                Node* new_branch = create_node(value);
+                add_element(first, new_branch);
+            }
+           // getchar();
+        }
+    }
+}
+
 
 Player* run(Game* game)
 {	
@@ -537,54 +590,17 @@ Player* run(Game* game)
         	case IA:
         	{
                 system("clear");
-                int nb_position;
-                Position* heroes = get_heroes_position(game, (who_is_playing)? RED : BLUE, &nb_position);
- 
-                Position* initial;
-                Position* move;
-                Position* attack;
-                Game* copy;
-                Game* copy_attack;
-                for(int i=0; i<nb_position; i++) {
-                    printf("========================== HERO (%d, %d) ==========================\n", heroes[i].line, heroes[i].column);
-                    initial = malloc(sizeof(Position));
-                    *initial = heroes[i];
-                    int nb_possible_moves;
-                    Position* possible_moves = get_posible_moves(game, initial->line, initial->column, &nb_possible_moves);
 
-                    for(int j = 0; j < nb_possible_moves; j++)
-                    {
-                        copy = copy_game(game);
-                        printf("------------------------- deplacement (%d, %d) -------------------------\n", possible_moves[j].line, possible_moves[j].column);
-                        moove(copy->board, initial->line, initial->column, possible_moves[j].line, possible_moves[j].column);
-                        printf("reel:\n");
-                        display_board(game->board, game->config_height, game->config_width);
-                        printf("deplacement:\n");
-                        display_board(copy->board, copy->config_height, copy->config_width);
-                        move = malloc(sizeof(Position));
-                        *move = possible_moves[j];
-                        int nb_possible_attack;
-                        Position* possible_attacks = get_posible_attack(copy, move->line, move->column, &nb_possible_attack);
-
-                        for(int k = 0; k < nb_possible_attack; k++)
-                        {
-                            copy_attack = copy_game(copy);
-                            printf("debug:\n");
-                            if(possible_attacks[k].line >= 0 && possible_attacks[k].column >= 0)
-                                attack_and_response(copy_attack, possible_moves[j].line, possible_moves[j].column, possible_attacks[k].line, possible_attacks[k].column);                                
-                            int score = score_board(copy_attack, player, possible_moves[j].line, possible_moves[j].column);
-                            display_board(copy_attack->board, copy_attack->config_height, copy_attack->config_width);
-                            printf(">>>>>>>>> attaque possible (%d, %d) <<<<<<<<\n", possible_attacks[k].line, possible_attacks[k].column);
-                            attack = malloc(sizeof(Position));
-                            *attack = possible_attacks[k];
-                            NodeValue* value = create_node_value(score, initial, move, attack);
-                            display_node_value(value);
-                        }
-                        getchar();
-                    }
+                Node* first = create_node(NULL);
+                develop_node(first, game, who_is_playing);
+                Game* copy = copy_game(game);
+                for(int i = 0; i < first->nb_arg; i++)
+                {
+                    NodeValue* value = (first->node_list+i)->value;
+                    moove(copy->board, value->initial_position->line, value->initial_position->column, value->move_position->line, value->move_position->column);
+                    develop_node(first->node_list+i, copy, who_is_playing);
                 }
-            
-                display_board(game->board, game->config_height, game->config_width);
+                display_node(first, 0);                          
                 getchar();
 
         		break;
