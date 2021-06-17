@@ -24,4 +24,4 @@ int** get_scope_count(Box** board, int line, int column, int config_height, int 
 
 Box* get_neighbours(Box** board, int line, int column, int* nb_neighbours, int config_height, int config_width);
 
-Box** copy_board(Box** board);
+Box** copy_board(Box** board, int config_height, int config_width);

@@ -2,7 +2,7 @@ FLAGS = -c -Wall -Werror -Wextra
 
 .PHONY: clean real-clean
 
-peter-quest: main.o config.o screen.o hero.o race.o box.o board.o player.o game.o
+peter-quest: main.o config.o screen.o hero.o race.o box.o board.o player.o game.o node.o
 	gcc -o $@ $^
 
 main.o: main.c main.h config.h
@@ -11,7 +11,10 @@ main.o: main.c main.h config.h
 config.o: config.c config.h main.h
 	gcc $(FLAGS) $<
 
-game.o: game.c game.h board.h player.h screen.h
+game.o: game.c game.h board.h player.h screen.h node.h
+	gcc $(FLAGS) $<
+
+node.o: node.c node.h main.h
 	gcc $(FLAGS) $<
 
 screen.o: screen.c screen.h main.h

@@ -11,3 +11,7 @@ void get_screen_dimensions(int* height, int* width);
 void display_messages(int argc, ...);
 
 
+/**
+    Clear the screen and print "PETER QUEST" in ascii art
+*/
+void show_about();

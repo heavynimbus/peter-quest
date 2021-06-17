@@ -276,7 +276,7 @@ int can_attack(Game* game, int line, int column)
 }
 
 
-int score_board(Game* game, Player* player, int line, int column) {
+/*int score_board(Game* game, Player* player, int line, int column) {
     int score = 0;
     int count_red = 0;
     int count_blue = 0;
@@ -331,7 +331,7 @@ int score_board(Game* game, Player* player, int line, int column) {
     getchar();
 
     return score;
-}
+}*/
 
 void attack_and_response(Game* game, int allyLine, int allyColumn, int enemyLine, int enemyColumn)
 {
@@ -357,15 +357,6 @@ void attack_and_response(Game* game, int allyLine, int allyColumn, int enemyLine
 		kill(game->board, enemyLine, enemyColumn);
 }
 
-Node* create_node(Game* game) {
-    Node* node = malloc(sizeof(Node));
-    node->game = game;
-    node->children = calloc(game->config_height*game->config_width, sizeof(Node));
-    node->score = -1;
-    node->nb_children = 0;
-    return node;
-}
-
 Position* get_heroes_position(Game* game, HeroType type, int* nb_position) {
     Position* result = calloc(4, sizeof(Position));
     int count = 0;
@@ -387,7 +378,7 @@ Position* get_heroes_position(Game* game, HeroType type, int* nb_position) {
 
 Game* copy_game(Game* game) {
     Game* copy = malloc(sizeof(Game));
-    copy->board = copy_board(game->board);
+    copy->board = copy_board(game->board, game->config_height, game->config_width);
     copy->config_height = game->config_height;
     copy->config_width = game->config_width;
     copy->player1 = game->player1;
@@ -395,8 +386,8 @@ Game* copy_game(Game* game) {
     return copy;
 }
 
-Position* get_posible_moved(Game* game, int line, int column, int nb_position) {
-    int** moove_count = get_moove_count(game, int line, int column);
+Position* get_posible_moves(Game* game, int line, int column, int* nb_position) {
+    int** moove_count = get_moove_count(game, line, column);
     int shifting = game->board[line][column].hero->race->shifting;
     int count = 0;
     Position* result = calloc(game->config_height*game->config_width, sizeof(Position));
@@ -412,12 +403,30 @@ Position* get_posible_moved(Game* game, int line, int column, int nb_position) {
 
     *nb_position = count;
     return result;
+}
+
+Position* get_posible_attack(Game* game, int line, int column, int* nb_position) {
+    int** scope_count = get_scope_count(game->board, line, column, game->config_height, game->config_width);
+    int scope = game->board[line][column].hero->race->scope;
+    HeroType enemy = (game->board[line][column].hero->type == BLUE)? RED: BLUE;
+    int count = 0;
+    Position* result = calloc(game->config_height*game->config_width, sizeof(Position));
+    for (int i=0; i<game->config_height; i++) {
+        for(int j=0; j<game->config_width; j++) {
+            if(scope_count[i][j] <= scope && game->board[i][j].hero->type == enemy) {
+                result[count].line = i;
+                result[count].column = j;
+                count++;
+            }
+        }
+    }
+    Position* no_attack = create_position(-1, -1);
+    result[count++] = *no_attack;
+    *nb_position = count;
+    return result;
     
 }
 
-void add_node(Node* first, Node* second) {
-    
-}
 
 Player* run(Game* game)
 {	
@@ -529,21 +538,46 @@ Player* run(Game* game)
         	}
         	case IA:
         	{
-                int nb_position;
-                int nb_possible_move;
-                int score;
-
                 system("clear");
+                int nb_position;
                 Position* heroes = get_heroes_position(game, (who_is_playing)? RED : BLUE, &nb_position);
-                Node* first_node = create_node(game);
+ 
+                Position* initial;
+                Position* move;
+                Position* attack;
                 Game* copy;
+                //Game* copy_position;
+                //Game* copy_atttack;
                 for(int i=0; i<nb_position; i++) {
-                    printf("%d\t%d\n", heroes[i].line, heroes[i].column);
-                    Position* possible_move = get_posible_moved(game, heroes[i].line, heroes[i].column, &nb_possible_move);
-                    for(int j=0; j<nb_possible_move; j++) {
+                    printf("========================== HERO (%d, %d) ==========================\n", heroes[i].line, heroes[i].column);
+                    initial = malloc(sizeof(Position));
+                    *initial = heroes[i];
+                    int nb_possible_moves;
+                    Position* possible_moves = get_posible_moves(game, initial->line, initial->column, &nb_possible_moves);
+
+                    for(int j = 0; j < nb_possible_moves; j++)
+                    {
                         copy = copy_game(game);
-                        moove(copy->board, heroes[i].line, heroes[i].column, possible_move[j].line, possible_move[j].column);
-                        score = score_board(copy, player, possible_move[j].line, possible_move[j].column);
+                        printf("------------------------- deplacement (%d, %d) -------------------------\n", possible_moves[j].line, possible_moves[j].column);
+                        moove(copy->board, initial->line, initial->column, possible_moves[j].line, possible_moves[j].column);
+                        printf("reel:\n");
+                        display_board(game->board, game->config_height, game->config_width);
+                        printf("deplacement:\n");
+                        display_board(copy->board, copy->config_height, copy->config_width);
+                        move = malloc(sizeof(Position));
+                        *move = possible_moves[j];
+                        int nb_possible_attack;
+                        Position* possible_attacks = get_posible_attack(copy, move->line, move->column, &nb_possible_attack);
+
+                        for(int k = 0; k < nb_possible_attack; k++)
+                        {
+                            printf(">>>>>>>>> attaque possible (%d, %d) <<<<<<<<\n", possible_attacks[k].line, possible_attacks[k].column);
+                            attack = malloc(sizeof(Position));
+                            *attack = possible_attacks[k];
+                            NodeValue* value = create_node_value(i, initial, move, attack);
+                            display_node_value(value);
+                        }
+                        getchar();
                     }
                 }
             
