@@ -276,7 +276,7 @@ int can_attack(Game* game, int line, int column)
 }
 
 
-/*int score_board(Game* game, Player* player, int line, int column) {
+int score_board(Game* game, Player* player, int line, int column) {
     int score = 0;
     int count_red = 0;
     int count_blue = 0;
@@ -327,11 +327,9 @@ int can_attack(Game* game, int line, int column)
         score = score - count_shifting_b*PROXIMITY_ENEMY;
     }
 
-    printf("\n%d : %d\n", count_shifting_b, count_shifting_r);
-    getchar();
 
     return score;
-}*/
+}
 
 void attack_and_response(Game* game, int allyLine, int allyColumn, int enemyLine, int enemyColumn)
 {
@@ -546,8 +544,7 @@ Player* run(Game* game)
                 Position* move;
                 Position* attack;
                 Game* copy;
-                //Game* copy_position;
-                //Game* copy_atttack;
+                Game* copy_attack;
                 for(int i=0; i<nb_position; i++) {
                     printf("========================== HERO (%d, %d) ==========================\n", heroes[i].line, heroes[i].column);
                     initial = malloc(sizeof(Position));
@@ -571,10 +568,16 @@ Player* run(Game* game)
 
                         for(int k = 0; k < nb_possible_attack; k++)
                         {
+                            copy_attack = copy_game(copy);
+                            printf("debug:\n");
+                            if(possible_attacks[k].line >= 0 && possible_attacks[k].column >= 0)
+                                attack_and_response(copy_attack, possible_moves[j].line, possible_moves[j].column, possible_attacks[k].line, possible_attacks[k].column);                                
+                            int score = score_board(copy_attack, player, possible_moves[j].line, possible_moves[j].column);
+                            display_board(copy_attack->board, copy_attack->config_height, copy_attack->config_width);
                             printf(">>>>>>>>> attaque possible (%d, %d) <<<<<<<<\n", possible_attacks[k].line, possible_attacks[k].column);
                             attack = malloc(sizeof(Position));
                             *attack = possible_attacks[k];
-                            NodeValue* value = create_node_value(i, initial, move, attack);
+                            NodeValue* value = create_node_value(score, initial, move, attack);
                             display_node_value(value);
                         }
                         getchar();

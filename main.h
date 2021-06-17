@@ -48,4 +48,11 @@
 #define DOUBLE_VERTICAL 0x2551
 #define SIMPLE_VERTICAL 0x2502
 
+#define NB_ALLY 1000
+#define NB_ENEMY 500 
+#define HP_ALLY 20
+#define HP_ENEMY 10
+#define PROXIMITY_ALLY 0
+#define PROXIMITY_ENEMY 1
+
 void between(int* value, int min, int max);

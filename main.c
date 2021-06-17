@@ -14,7 +14,6 @@ void display_winner(Player* winner) {
 }
 
 
-
 int main()
 {
 	setlocale(LC_CTYPE, ""); // for unicode chars
