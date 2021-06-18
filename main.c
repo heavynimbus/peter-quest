@@ -43,7 +43,7 @@ int main()
 				{
 					Game* game = init_game(config_height, config_width);
 					ask_player_name(game, 0);
-					int level_ia = menu(3, "level 1", "level 2", "level 3");
+					int level_ia = menu(2, "level 1", "level 2");
 
 					set_player(game, "IA", IA, level_ia+1, 1);
 

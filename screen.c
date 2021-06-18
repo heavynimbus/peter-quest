@@ -43,6 +43,7 @@ void show_about()
     printf("Cette application a pour but premier de s'amuser entre amis.\n");
     printf("Ne jamais oublier cela !\n");
     printf("Nous vous laissons jouer et vous éclater dessus.\n");
+    printf("N'hesitez pas à faire un retour en cas de bug sur \e]8;;http://www.github.com/heavynimbus/peter-quest\ale projet github :)\e]8;;\a\n");
     printf("Créateurs : \n");
     printf("         _________ _______  ______   _______  _______                                                _______  _______  \n");
     printf("|\\     /|\\__   __/(  ____ \\(  __  \\ (  ____ \\(  ____ )                            |\\     /||\\     /|(  ____ \\(  ___  ) \n");
