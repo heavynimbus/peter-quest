@@ -24,7 +24,7 @@ int main()
 	int config_height, config_width;
 	get_config(config_file_path, &config_height, &config_width);
 
-	switch(menu(4, "Jouer", "Regles du jeu", "Options", "Quitter"))
+	switch(menu(5, "Jouer", "Regles du jeu", "Options", "A propos", "Quitter"))
 	{
 		case 0:
 			switch(menu(4, "0 Joueur (IA vs IA)", "1 Joueur (1 VS IA)", "2 Joueurs (1 VS 1)", "Retour"))
@@ -67,12 +67,18 @@ int main()
 			}
 			break;
 		case 1:
+			show_rules();
+			getchar();
 			return main();
 		case 2:
 			option_menu(&config_height, &config_width);
 			set_config(config_file_path, config_height, config_width);
 			return main();
 		case 3:
+			show_about();
+			getchar();
+			return main();
+		case 4:
 			return 0;
 	}
 	return 0;

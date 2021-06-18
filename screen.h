@@ -4,6 +4,10 @@
 
 void show_logo();
 
+void show_about();
+
+void show_rules();
+
 int menu ( int argc, ... );
 
 void get_screen_dimensions(int* height, int* width);
