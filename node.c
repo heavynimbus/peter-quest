@@ -54,7 +54,9 @@ void add_element(Node* node, Node* to_add)
 	if(node->nb_arg >= node->node_list_size)
 	{
 		node->node_list_size += 50;
+		printf("ici");
 		node->node_list = realloc(node->node_list, node->node_list_size);
+		printf("la");
 	}
 	node->node_list[node->nb_arg] = *to_add;
 	node->nb_arg++;

@@ -7,6 +7,7 @@ typedef enum{
 typedef struct{
 	PlayerType type;
 	char* username;
+	int level;
 }Player;
 
 void display_player(Player* player);

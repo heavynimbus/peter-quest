@@ -71,15 +71,17 @@ void display_player_informations(Game* game){
 /**
     Set the player to the game
 */
-void set_player(Game* g, char* username, PlayerType type, int id){
+void set_player(Game* g, char* username, PlayerType type, int level, int id){
     switch(id){
         case 0:
             g->player1->username = username;
             g->player1->type = type;
+            g->player1->level = level;
             break;
         case 1:
             g->player2->username = username;
             g->player2->type = type;
+            g->player2->level = level;
             break;
     }
 }
@@ -94,7 +96,7 @@ void ask_player_name(Game* g, int id){
 	fgets(result, 30, stdin);
 	if(result[strlen(result)-1]=='\n')result[strlen(result)-1]=0;
 	if(strlen(result) == 0) sprintf(result, "Joueur %d", id+1);
-	set_player(g, result, HUMAN, id);
+	set_player(g, result, HUMAN, 0, id);
 }
 
 
@@ -276,7 +278,7 @@ int can_attack(Game* game, int line, int column)
 }
 
 
-int score_board(Game* game, Player* player, int line, int column) {
+int score_board(Game* game, int who_is_playing, int line, int column) {
     int score = 0;
     int count_red = 0;
     int count_blue = 0;
@@ -311,7 +313,7 @@ int score_board(Game* game, Player* player, int line, int column) {
     }
 
 
-    if (player->type == HUMAN) {
+    if (!who_is_playing) {
         score = score + count_blue*NB_ALLY;
         score = score - count_red*NB_ENEMY;
         score = score + count_hp_b*HP_ALLY;
@@ -425,7 +427,7 @@ Position* get_posible_attack(Game* game, int line, int column, int* nb_position)
     
 }
 
-void develop_node(Node* first, Game* game, int who_is_playing)
+Node* develop_node(Node* first, Game* game, int who_is_playing)
 {
     int nb_position;
     Position* heroes = get_heroes_position(game, (who_is_playing)? RED : BLUE, &nb_position);
@@ -438,7 +440,7 @@ void develop_node(Node* first, Game* game, int who_is_playing)
     Game* copy_attack;
     
     for(int i=0; i<nb_position; i++) {
-        printf("========================== HERO (%d, %d) ==========================\n", heroes[i].line, heroes[i].column);
+ //       printf("========================== HERO (%d, %d) ==========================\n", heroes[i].line, heroes[i].column);
         initial = malloc(sizeof(Position));
         *initial = heroes[i];
         int nb_possible_moves;
@@ -447,12 +449,12 @@ void develop_node(Node* first, Game* game, int who_is_playing)
         for(int j = 0; j < nb_possible_moves; j++)
         {
             copy = copy_game(game);
-            printf("------------------------- deplacement (%d, %d) -------------------------\n", possible_moves[j].line, possible_moves[j].column);
+   //         printf("------------------------- deplacement (%d, %d) -------------------------\n", possible_moves[j].line, possible_moves[j].column);
             moove(copy->board, initial->line, initial->column, possible_moves[j].line, possible_moves[j].column);
-            printf("reel:\n");
-            display_board(game->board, game->config_height, game->config_width);
-            printf("deplacement:\n");
-            display_board(copy->board, copy->config_height, copy->config_width);
+     //       printf("reel:\n");
+     //       display_board(game->board, game->config_height, game->config_width);
+       //     printf("deplacement:\n");
+        //    display_board(copy->board, copy->config_height, copy->config_width);
             move = malloc(sizeof(Position));
             *move = possible_moves[j];
             int nb_possible_attack;
@@ -461,12 +463,12 @@ void develop_node(Node* first, Game* game, int who_is_playing)
             for(int k = 0; k < nb_possible_attack; k++)
             {
                 copy_attack = copy_game(copy);
-                printf("debug:\n");
+          //      printf("debug:\n");
                 if(possible_attacks[k].line >= 0 && possible_attacks[k].column >= 0)
                     attack_and_response(copy_attack, possible_moves[j].line, possible_moves[j].column, possible_attacks[k].line, possible_attacks[k].column);                                
-                int score = score_board(copy_attack, (who_is_playing)?copy_attack->player2:copy_attack->player1, possible_moves[j].line, possible_moves[j].column);
-                display_board(copy_attack->board, copy_attack->config_height, copy_attack->config_width);
-                printf(">>>>>>>>> attaque possible (%d, %d) <<<<<<<<\n", possible_attacks[k].line, possible_attacks[k].column);
+                int score = score_board(copy_attack, who_is_playing, possible_moves[j].line, possible_moves[j].column);
+            //    display_board(copy_attack->board, copy_attack->config_height, copy_attack->config_width);
+             //   printf(">>>>>>>>> attaque possible (%d, %d) <<<<<<<<\n", possible_attacks[k].line, possible_attacks[k].column);
                 attack = malloc(sizeof(Position));
                 *attack = possible_attacks[k];
                 NodeValue* value = create_node_value(score, initial, move, attack);
@@ -476,6 +478,78 @@ void develop_node(Node* first, Game* game, int who_is_playing)
            // getchar();
         }
     }
+    return first;
+}
+
+Game* copy_and_play_action(Game* game, NodeValue* value)
+{
+    Game* copy = copy_game(game);
+    moove(copy->board, value->initial_position->line, value->initial_position->column, value->move_position->line, value->move_position->column);
+    if(value->attack_position->line >= 0 && value->attack_position->column >= 0)
+    {
+        attack_and_response(copy, value->move_position->line, value->move_position->column, value->attack_position->line, value->attack_position->column);
+    }
+    return copy;
+}
+
+Node* get_min(Node* node)
+{
+    Node* result = node->node_list;
+    for(int i = 1; i < node->nb_arg; i++)
+    {
+        if(node->node_list[i].value->score < result->value->score)
+            result = node->node_list + i;
+    }
+    return result;
+}
+
+Node* get_max(Node* node)
+{
+    Node* result = node->node_list;
+    for(int i = 1; i < node->nb_arg; i++)
+    {
+        if(node->node_list[i].value->score > result->value->score)
+            result = node->node_list + i;
+    }
+    return result;
+}
+
+NodeValue* get_ia_decision(Game* game, int who_is_playing, int size_of_tree)
+{
+    Node* first = create_node(NULL);
+    develop_node(first, game, who_is_playing);
+    Game* copy;
+    
+    switch(size_of_tree)
+    {
+        case 1:
+        {
+            Node* max = get_max(first);
+            return max->value;
+        }
+        case 2:
+        {
+            Node* second_final = NULL;
+            Node* min_final = NULL;
+            /*
+                dans ce for un il y a un seg fault non résolu qui apparait rarement en fin de partie
+            */
+            for(int i = 0; i < first->nb_arg; i++)
+            {
+                Node* second = first->node_list+i;
+                copy = copy_and_play_action(game, second->value);
+                develop_node(second, copy, !who_is_playing);                
+                Node* min = get_min(second);
+                if(((second_final == NULL) || (min_final == NULL)) || (min_final->value->score > min->value->score))
+                {
+                    second_final = second;
+                    min_final = min;
+                }
+            }
+            return second_final->value;
+        }
+    }
+    return NULL;
 }
 
 
@@ -589,11 +663,106 @@ Player* run(Game* game)
         	}
         	case IA:
         	{
-                system("clear");
+                NodeValue* ia_decision = get_ia_decision(game, who_is_playing, player->level);
+                if(ia_decision->initial_position->line == ia_decision->move_position->line &&
+                    ia_decision->initial_position->column == ia_decision->move_position->column)
+                    sprintf(message, "%s%s a passé son déplacement",message_color, player->username);
+                else
+                {
+                    moove(game->board, ia_decision->initial_position->line, ia_decision->initial_position->column, ia_decision->move_position->line, ia_decision->move_position->column);
+                    sprintf(message, "%s a deplacé son hero de %c%d à %c%d", player->username, ia_decision->initial_position->line + 'A', ia_decision->initial_position->column+1, ia_decision->move_position->line + 'A', ia_decision->move_position->column+1);
+                }
+                char* attack_message = calloc(255, sizeof(char));
+                if(ia_decision->attack_position->line >= 0 && ia_decision->attack_position->column >= 0)
+                {
+                    attack_and_response(game, ia_decision->move_position->line, ia_decision->move_position->column, ia_decision->attack_position->line, ia_decision->attack_position->column);
+                    sprintf(attack_message, " et a attaqué en %c%d\n", ia_decision->attack_position->line + 'A', ia_decision->attack_position->column + 1);
+                }                    
+                else
+                    sprintf(attack_message, " et a passé l'attaque");
+                strcat(message, attack_message);
+                game->board[ia_decision->move_position->line][ia_decision->move_position->column].hero->is_tired = 1;
+                display_game(game, -1, -1, message);
+                getchar();
+
+                /*system("clear");
 
                 Node* first = create_node(NULL);
-                develop_node(first, game, who_is_playing);
-                Game* copy = copy_game(game);
+
+                Game* copy ;
+                
+                Node* list_node = first;
+                int nb_element_list_node = 1;
+
+                int size_new_list = 255;
+                int nb_element_new_list = 0;
+                Node* new_list = calloc(size_new_list, sizeof(Node));
+
+                int who_is_playing_tmp = who_is_playing;
+
+                int cpt = 0, limit = 2;
+                while(cpt < limit)
+                {
+                    printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+                    for(int i = 0; i < nb_element_list_node; i++) // 1
+                    {
+                        // COPIE DE LA GAME ET ACTIONS
+                        copy = copy_game(game);
+                        if(list_node[i].value != NULL)
+                        {
+                            NodeValue* value = list_node[i].value;
+                            moove(copy->board, value->initial_position->line, value->initial_position->column, value->move_position->line, value->move_position->column);
+                            if(value->attack_position->line >= 0 && value->attack_position->column >= 0)
+                            {
+                                attack_and_response(copy, value->move_position->line, value->move_position->column, value->attack_position->line, value->attack_position->column);
+                            }                            
+                        }
+
+                        // ON DEVELOPPE LE NODE
+                        *(list_node + i) = *(develop_node(list_node+i, copy, who_is_playing_tmp));
+                        display_node(list_node+i, 0);
+                        printf("nb_arg: %d", list_node[i].nb_arg);
+                        getchar();
+
+                        // !! SEG FAULT
+                        for(int j = 0; j < list_node[i].nb_arg; j++)
+                        {
+                            printf("j:%d\n", j);
+                            new_list[nb_element_new_list++] = list_node[i].node_list[j];
+                            printf("added:");
+                            display_node(list_node[i].node_list + j, 0);
+                            getchar();
+                            //printf("nb elements new list %d\n", nb_element_new_list);
+
+                            if(nb_element_new_list >= size_new_list)
+                            {
+                                size_new_list += 255;
+                                new_list = reallocarray(new_list, size_new_list, sizeof(Node));
+                            }
+                        }
+
+
+                        display_board(copy->board, copy->config_height, copy->config_width);
+                        display_node(list_node+i, 0);
+                        getchar();
+                    }
+                    list_node = new_list;
+
+                    nb_element_list_node = nb_element_new_list;
+                    nb_element_new_list = 0;
+                    who_is_playing_tmp = (who_is_playing_tmp)?0:1;
+                    cpt++;
+
+                    printf("%d/%d\n", cpt, limit);
+                    printf("nb_element_list_node:%d\n", nb_element_list_node);
+                    for(int i = 0; i < nb_element_list_node; i++)
+                    {
+                        //printf("--------------------- New node --------------------\n");
+                        display_node(list_node+i, 0);
+                    }
+                    getchar();
+                }
+                
                 for(int i = 0; i < first->nb_arg; i++)
                 {
                     NodeValue* value = (first->node_list+i)->value;
@@ -603,7 +772,9 @@ Player* run(Game* game)
                 display_node(first, 0);                          
                 getchar();
 
-        		break;
+        		break;*/
+
+               
         	}
         }
         is_player2_winner = update_game_state(game, &who_is_playing, &is_game_finished);

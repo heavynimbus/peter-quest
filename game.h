@@ -35,6 +35,6 @@ void ask_player_name(Game* g, int id);
 
 void display_game(Game* game, int selected_height, int selected_width, char* message);
 
-void set_player(Game* g, char* username, PlayerType type, int id);
+void set_player(Game* g, char* username, PlayerType type, int level, int id);
 
 Game* copy_game(Game* game);
