@@ -537,13 +537,9 @@ NodeValue* get_ia_decision(Game* game, int who_is_playing, int size_of_tree)
             for(int i = 0; i < first->nb_arg; i++)
             {
                 Node* second = first->node_list+i;
-                printf("ici");
                 copy = copy_and_play_action(game, second->value);
-                printf("ici");
                 develop_node(second, copy, !who_is_playing);                
-                printf("ici");
                 Node* min = get_max(second);
-                printf("ici");
                 if(((second_final == NULL) || (min_final == NULL)) || (min_final->value->score > min->value->score))
                 {
                     second_final = second;
